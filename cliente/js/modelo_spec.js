@@ -7,6 +7,7 @@ describe("El juego niveles inicialmente...", function () {
   it("una colección de niveles", function () {
     
 
+
     expect(juego.niveles.length).toEqual(0);
     expect(juego.usuarios.length).toEqual(0);
   });
