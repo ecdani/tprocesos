@@ -64,7 +64,7 @@ function create() {
     //ledge.body.immovable = true;
 
     //ledge = platforms.create(-150, 250, 'ground');
-   // ledge.body.immovable = true;
+    // ledge.body.immovable = true;
 
     for (var i = 0; i < Math.random()*10; i++) {
         ledge = platforms.create(Math.random()*1000, Math.random()*1000, 'ground');
@@ -80,8 +80,9 @@ function create() {
 
     //  Player physics properties. Give the little guy a slight bounce.
     player.body.bounce.y = 0.01;
-    player.body.gravity.y = 1000;
+    player.body.gravity.y = 100;
     player.body.collideWorldBounds = true;
+    //player.body.setCircle(20);
 
     //  Our two animations, walking left and right.
     
@@ -104,18 +105,20 @@ function create() {
     stars.enableBody = true;
 
     //  Here we'll create 12 of them evenly spaced apart
-    for (var i = 0; i < 12; i++)
-    {
+    for (var i = 0; i < 12; i++) {
         //  Create a star inside of the 'stars' group
         //var star = stars.create(i * 70, [0], 'star');
         var star = stars.create(i*70, 0, 'star');
 
         //  Let gravity do its thing
-        star.body.gravity.y = 1000;
-        star.body.gravity.x = Math.floor(Math.random() * 201) - 100;
+        star.body.gravity.y = 500;
+        //star.body.gravity.x = Math.floor(Math.random() * 201) - 100;
 
         //  This just gives each star a slightly random bounce value
         star.body.bounce.y = 0.7 + Math.random() * 0.2;
+
+        star.body.collideWorldBounds = true;
+        //star.body.setCircle(16);
         
        
     }
@@ -142,9 +145,10 @@ function update() {
     //  Collide the player and the stars with the platforms
     game.physics.arcade.collide(player, platforms);
     game.physics.arcade.collide(stars, platforms);
-
+    game.physics.arcade.collide(stars,stars);
+    game.physics.arcade.collide(player, stars);
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-    game.physics.arcade.overlap(player, stars, collectStar, null, this);
+    //game.physics.arcade.overlap(player, stars, collectStar, null, this);
 
     
 
@@ -227,7 +231,7 @@ function update() {
 function collectStar (player, star) {
     
     // Removes the star from the screen
-    star.kill();
+    //star.kill();
 
     //  Add and update the score
     score += 10;
