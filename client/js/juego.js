@@ -1,31 +1,25 @@
 
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'juegoId', { preload: preload, create: create, update: update });
+
+var game = new Phaser.Game(800,600, Phaser.AUTO, 'juegoId', { preload: preload, create: create, update: update });
 
 function preload() {
 
     game.load.image('sky', 'assets/sky.png');
     game.load.image('ground', 'assets/platform.png');
-    game.load.image('ground2', 'assets/platform2.png');
-    game.load.image('star', 'assets/star.png');
+    game.load.image('star', 'assets/pangball.png');
     game.load.spritesheet('dude', 'assets/neko.png', 32, 32);
-    game.load.image('heaven','assets/heaven.png');
 
 }
 
 var player;
 var platforms;
-var grupoFin;
 var cursors;
-var heaven;
 
 var stars;
-
-var text="Vidas:";
-var style={font:"30px Arial",fill:"#ffffff",align:"right"};
-var board;
-
-var segundos=0;
-var textContador=0;
+var score = 0;
+var scoreText;
+var block = 0;
+var block2 = 0;
 var timer;
 
 function create() {
@@ -38,11 +32,9 @@ function create() {
 
     //  The platforms group contains the ground and the 2 ledges we can jump on
     platforms = game.add.group();
-    grupoFin=game.add.group();
 
     //  We will enable physics for any object that is created in this group
     platforms.enableBody = true;
-    grupoFin.enableBody=true;
 
     // Here we create the ground.
     var ground = platforms.create(0, game.world.height - 64, 'ground');
@@ -54,209 +46,180 @@ function create() {
     ground.body.immovable = true;
 
     //  Now let's create two ledges
-    var ledge = platforms.create(200, 450, 'ground2');
-    ledge.body.immovable = true;
-
-    ledge = platforms.create(100, 350, 'ground2');
-    ledge.body.immovable = true;
-
-    ledge = platforms.create(0, 250, 'ground2');
-    ledge.body.immovable = true;
-
-    ledge = platforms.create(200, 150, 'ground2');
-    ledge.body.immovable = true;
-
-    //zona derecha
-    ledge = platforms.create(700, 450, 'ground2');
-    ledge.body.immovable = true;
-
-    ledge = platforms.create(600, 350, 'ground2');
-    ledge.body.immovable = true;
-
-    ledge = platforms.create(game.world.height-100, 250, 'ground2');
-    ledge.body.immovable = true;
-
-    ledge = platforms.create(600, 150, 'ground2');
-    ledge.body.immovable = true;
-
-    heaven=grupoFin.create(0,0,'heaven');
-    heaven.scale.setTo(2,1);
-    heaven.body.immovable = true;
-
-    //ledge = platforms.create(350, 60, 'ground');
+    var ledge;// = platforms.create(400, 400, 'ground');
     //ledge.body.immovable = true;
 
-    // The player and its settings
-    player = game.add.sprite(32, game.world.height - 110, 'dude');
+    //ledge = platforms.create(-150, 250, 'ground');
+    // ledge.body.immovable = true;
 
-    player.vidas=5;
+    for (var i = 0; i < Math.random() * 10; i++) {
+        ledge = platforms.create(Math.random() * 1000, Math.random() * 1000, 'ground');
+        ledge.body.immovable = true;
+    }
+
+
+    // The player and its settings
+    player = game.add.sprite(32, game.world.height - 150, 'dude');
 
     //  We need to enable physics on the player
     game.physics.arcade.enable(player);
 
     //  Player physics properties. Give the little guy a slight bounce.
-    player.body.bounce.y = 0.2;
-    player.body.gravity.y = 300;
+    player.body.bounce.y = 0.01;
+    player.body.gravity.y = 100;
     player.body.collideWorldBounds = true;
+    //player.body.setCircle(20);
 
     //  Our two animations, walking left and right.
-    player.animations.add('left', [0, 1, 2, 3], 10, true);
-    player.animations.add('right', [5, 6, 7, 8], 10, true);
 
-    /*
-    player2 = game.add.sprite(232, game.world.height - 110, 'dude');
+    player.animations.add('right', [14, 15, 14, 15], 10, true);
+    player.animations.add('rightjump', [18, 19], 5, true);
+    player.animations.add('rightfall', [23], 10, true);
+    player.animations.add('left', [12, 13, 12, 13], 10, true);
+    player.animations.add('leftjump', [16, 17], 5, true);
+    player.animations.add('leftfall', [21], 10, true);
 
-    //  We need to enable physics on the player
-    game.physics.arcade.enable(player2);
+    player.animations.add('jump', [9, 8], 5, true);
+    player.animations.add('fall', [11], 10, true);
+    player.animations.add('sleep', [5, 6], 0.6, true);
 
-    //  Player physics properties. Give the little guy a slight bounce.
-    player2.body.bounce.y = 0.2;
-    player2.body.gravity.y = 0;//300
-    player2.body.collideWorldBounds = true;
-
-    //  Our two animations, walking left and right.
-    player2.animations.add('left', [0, 1, 2, 3], 10, true);
-    player2.animations.add('right', [5, 6, 7, 8], 10, true);
-    */
 
     //  Finally some stars to collect
     stars = game.add.group();
 
     //  We will enable physics for any star that is created in this group
     stars.enableBody = true;
-    stars.physicsBodyType = Phaser.Physics.ARCADE;
 
     //  Here we'll create 12 of them evenly spaced apart
-    for (var i = 0; i < 12; i++)
-    {
+    for (var i = 0; i < 12; i++) {
         //  Create a star inside of the 'stars' group
-        var star = stars.create(i * 70, 64, 'star'); //i*70,0
+        //var star = stars.create(i * 70, [0], 'star');
+        var star = stars.create(i * 70, 0, 'star');
 
         //  Let gravity do its thing
-        star.body.gravity.y = 100;
+        star.body.gravity.y = 500;
+        //star.body.gravity.x = Math.floor(Math.random() * 201) - 100;
 
         //  This just gives each star a slightly random bounce value
-        //star.body.bounce.y = 0.7 + Math.random() * 0.2;
-        star.checkWorldBounds = true;
+        star.body.bounce.y = 0.7 + Math.random() * 0.2;
+
+        star.body.collideWorldBounds = true;
+        //star.body.setCircle(16);
+
+
     }
-     text="Vidas: "+player.vidas;
-    board=game.add.text(game.world.width-150,30,text,style);
 
-    textContador=game.add.text(game.world.width-155,60,'Tiempo:0',style);
-    timer=game.time.events.loop(Phaser.Timer.SECOND,updateContador,this);
-
-    //var name = prompt("Hola jugador, escribe tu nombre", "Nadie");if(name) {    console.log("Hola "+name+", encantado de conocerte!");}
-
-    player.name=name;
+    //  The score
+    scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 
     //  Our controls.
     cursors = game.input.keyboard.createCursorKeys();
-    
+
+
+
+
+}
+
+function sleep() {
+    player.animations.play('sleep');
+    block = 1;
+    block2 = 0;
 }
 
 function update() {
-   
+
     //  Collide the player and the stars with the platforms
     game.physics.arcade.collide(player, platforms);
-    //game.physics.arcade.collide(stars, platforms);
-
-    //game.physics.arcade.collide(player2, platforms);
-
+    game.physics.arcade.collide(stars, platforms);
+    game.physics.arcade.collide(stars, stars);
+    game.physics.arcade.collide(player, stars);
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-    game.physics.arcade.overlap(player, stars, collectStar, null, this);
-    //game.physics.arcade.overlap(player2, stars, collectStar, null, this);
-    
-    game.physics.arcade.overlap(stars, platforms, endStar, null,this)
-    game.physics.arcade.overlap(player,grupoFin,endLevel,null,this);
+    //game.physics.arcade.overlap(player, stars, collectStar, null, this);
+
+
 
     //  Reset the players velocity (movement)
-    player.body.velocity.x = 0;
-   
-    //player.body.velocity.y=0;
+    //player.body.velocity.x = 0;
 
-    //player2.body.velocity.x = 0;
-    //player2.body.velocity.y=0;
-
-    if (cursors.left.isDown)
+    /*for (var i = 0; i < 12; i++)
     {
-        //  Move to the left
+        if (stars[i].body.touching) {
+            stars[i].animations.play('die');
+        }
+    }*/
+
+
+    if (cursors.left.isDown) {
+        block = 0;
         player.body.velocity.x = -150;
-
-        player.animations.play('left');
+        if (!player.body.touching.down && player.body.velocity.y < 0) {
+            player.animations.play('leftjump');
+        } else if (!player.body.touching.down) {
+            player.animations.play('leftfall');
+        } else {
+            player.animations.play('left');
+        }
     }
-    else if (cursors.right.isDown)
-    {
-        //  Move to the up
+
+    else if (cursors.right.isDown) {
+        block = 0;
         player.body.velocity.x = 150;
-
-        player.animations.play('right');
+        if (!player.body.touching.down && player.body.velocity.y < 0) {
+            player.animations.play('rightjump');
+        } else if (!player.body.touching.down) {
+            player.animations.play('rightfall');
+        } else {
+            player.animations.play('right');
+        }
     }
-    /*
-    else if (cursors.up.isDown)
-    {
-        //  Move to the up
-        player.body.velocity.y = -100;
-
-        player.animations.play('up');
+    else if (cursors.up.isDown) {
+        block = 0;
+        player.animations.play('jump');
     }
-    else if (cursors.down.isDown)
-    {
-        //  Move to the up
-        player.body.velocity.y = 100;
 
-        player.animations.play('down');
-    }
-    */
-    else
-    {
+    else if (!player.body.touching.down) {
+        //player.frame = 10;
+        if (player.body.velocity.y > 0 && player.body.velocity.x > 0) {
+            player.animations.play('rightfall');
+        } else if (player.body.velocity.y > 0 && player.body.velocity.x < 0) {
+            player.animations.play('leftfall');
+        } else {
+            player.animations.play('fall');
+        }
+    } else {
         //  Stand still
-        player.animations.stop();
+        if (cursors.down.isDown) {
+            player.animations.play('sleep');
+            block = 1;
+        } else if (block == 0) {
+            player.animations.stop();
 
-        player.frame = 4;
+            player.frame = 0;
+            player.body.velocity.x = 0;
+            if (block2 == 0) {
+                block2 = 1;
+                game.time.events.add(2000, sleep, this);
+            }
+
+        }
     }
-    
-    
+
     //  Allow the player to jump if they are touching the ground.
-    if (cursors.up.isDown && player.body.touching.down)
-    {
-        player.body.velocity.y = -250;
+    if (cursors.up.isDown && player.body.touching.down) {
+        player.body.velocity.y = -350;
+
     }
-    
+
+
 }
 
-function updateContador(){
-    segundos++;
-    textContador.setText('Tiempo: '+segundos);    
-}
+function collectStar(player, star) {
 
-function collectStar (player, star) {
-    
     // Removes the star from the screen
-    //console.log('jugador con estrella');
-    player.vidas=player.vidas-1.
-    board.setText("Vidas: "+player.vidas);
-    if (player.vidas<=0)
-    {
-        console.log("Has muerto!");
-        player.kill();
-    }
-    star.kill();
+    //star.kill();
+
+    //  Add and update the score
+    score += 10;
+    scoreText.text = 'Score: ' + score;
 
 }
-
-function endStar (star, platform) {
-    
-    // Removes the star from the screen
-    console.log('Estrella estrellada');
-    star.kill();
-
-}
-
-function endLevel(player,heaven){
-    console.log('Conseguiste completar el nivel');
-    game.time.events.remove(timer);
-    board.setText("Nivel completado!");
-    board.x=game.world.width-247;
-    player.kill();
-}
-

@@ -1,27 +1,46 @@
-var url="http://127.0.0.1:1338/";
 
-function iniciar(){
-	pedirNombre();
-	$('#inicio').append('<p id="crear"><button id="crear" type="button" class="btn btn-primary btn-lg">Crear nueva partida</button></p>');
-    $('#crear').on("click",function(){
-      $('#crear').remove();
-      $.getScript("js/juego.js", function(){
-        //Stuff to do after someScript has loaded
-        console.log("ok");
-      });
-      empezar($('#nombre').val());
-     });
- }
+var url = "http://127.0.0.1:1338/";
 
-function pedirNombre(){
-	$('#inicio').append('<p id="nom"><input type="text" id="nombre"> ')
+//Funciones que modifican el index
+
+function inicio() {
+  mostrarCabecera();
 }
 
-//Comunicaciones
- function empezar(nombre){
- 	if (nombre=="")
- 		nombre="jugador";
-	$.getJSON(url+"empezar/"+nombre,function(data){						
-						
-	})
+function borrarControl() {
+  $('#control').remove();
+}
+
+function mostrarCabecera() {
+  $('#cabecera').remove();
+  $('#control').append('<div id="cabecera"><h2>Panel de  Control</h2><input type="text" id="nombre" placeholder="introduce tu nombre"></div>');
+  botonNombre();
+}
+
+function botonNombre() {
+  var nombre = "";
+  $('#cabecera').append('<button type="button" id="nombreBtn" class="btn btn-primary btn-md">Enviar</button>');
+  $('#nombreBtn').on('click', function () {
+    nombre = $('#nombre').val();
+    $('#nombre').remove();
+    $('#nombreBtn').remove();
+    crearUsuario(nombre);
+  });
+}
+
+function mostrarInfoJugador(datos) {
+  $('#datos').remove();
+  $('#cabecera').append('<div id="datos">Nombre: ' + datos.nombre + ' Nivel: ' + datos.nivel + '</div>');
+}
+
+//Funciones de comunicación con el servidor
+
+function crearUsuario(nombre) {
+  if (nombre == "") {
+    nombre = "jugador";
+  }
+  $.getJSON(url + 'crearUsuario/' + nombre, function (datos) {
+    mostrarInfoJugador(datos);
+  });
+  //mostrar datos
 }
