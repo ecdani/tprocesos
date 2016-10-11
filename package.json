@@ -1,0 +1,28 @@
+{
+  "name": "tprocesos",
+  "version": "1.0.0",
+  "description": "Gallud",
+  "main": "node-express.js",
+  "dependencies": {
+    "express": "^4.9.6",
+    "fs": "^0.0.2",
+    "mongodb": "^2.1.18",
+    "ntwitter": "^0.5.0",
+    "underscore": "^1.7.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test",
+    "start": "node node-express.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ecdani/tprocesos.git"
+  },
+  "author": "Dani",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ecdani/tprocesos/issues"
+  },
+  "homepage": "https://github.com/ecdani/tprocesos#readme"
+}
