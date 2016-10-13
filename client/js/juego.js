@@ -1,14 +1,11 @@
 
-
-var game = new Phaser.Game(800,600, Phaser.AUTO, 'juegoId', { preload: preload, create: create, update: update });
+//var game = new Phaser.Game(800,600, Phaser.AUTO, 'juegoId', { preload: preload, create: create, update: update });
 
 function preload() {
-
     game.load.image('sky', 'assets/sky.png');
     game.load.image('ground', 'assets/platform.png');
     game.load.image('star', 'assets/pangball.png');
     game.load.spritesheet('dude', 'assets/neko.png', 32, 32);
-
 }
 
 var player;
@@ -23,27 +20,14 @@ var block2 = 0;
 var timer;
 
 function create() {
-
-    //  We're going to be using physics, so enable the Arcade Physics system
-    game.physics.startSystem(Phaser.Physics.ARCADE);
-
-    //  A simple background for our game
-    game.add.sprite(0, 0, 'sky');
-
-    //  The platforms group contains the ground and the 2 ledges we can jump on
-    platforms = game.add.group();
-
-    //  We will enable physics for any object that is created in this group
-    platforms.enableBody = true;
-
-    // Here we create the ground.
-    var ground = platforms.create(0, game.world.height - 64, 'ground');
-
-    //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-    ground.scale.setTo(2, 2);
-
-    //  This stops it from falling away when you jump on it
-    ground.body.immovable = true;
+    game.physics.startSystem(Phaser.Physics.ARCADE);  //  We're going to be using physics, so enable the Arcade Physics system
+    game.add.sprite(0, 0, 'sky'); //  A simple background for our game
+    platforms = game.add.group(); //  The platforms group contains the ground and the 2 ledges we can jump on
+    platforms.enableBody = true; //  We will enable physics for any object that is created in this group
+    
+    var ground = platforms.create(0, game.world.height - 64, 'ground'); // Here we create the ground.
+    ground.scale.setTo(2, 2); //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+    ground.body.immovable = true; //  This stops it from falling away when you jump on it
 
     //  Now let's create two ledges
     var ledge;// = platforms.create(400, 400, 'ground');
@@ -58,11 +42,9 @@ function create() {
     }
 
 
-    // The player and its settings
-    player = game.add.sprite(32, game.world.height - 150, 'dude');
-
-    //  We need to enable physics on the player
-    game.physics.arcade.enable(player);
+    
+    player = game.add.sprite(32, game.world.height - 150, 'dude'); // The player and its settings
+    game.physics.arcade.enable(player); //  We need to enable physics on the player
 
     //  Player physics properties. Give the little guy a slight bounce.
     player.body.bounce.y = 0.01;
@@ -72,23 +54,20 @@ function create() {
 
     //  Our two animations, walking left and right.
 
-    player.animations.add('right', [14, 15, 14, 15], 10, true);
-    player.animations.add('rightjump', [18, 19], 5, true);
-    player.animations.add('rightfall', [23], 10, true);
-    player.animations.add('left', [12, 13, 12, 13], 10, true);
-    player.animations.add('leftjump', [16, 17], 5, true);
-    player.animations.add('leftfall', [21], 10, true);
+    player.animations.add('right',      [14, 15, 14, 15],   10, true);
+    player.animations.add('rightjump',  [18, 19],            5, true);
+    player.animations.add('rightfall',  [23],               10, true);
+    player.animations.add('left',       [12, 13, 12, 13],   10, true);
+    player.animations.add('leftjump',   [16, 17],            5, true);
+    player.animations.add('leftfall',   [21],               10, true);
 
-    player.animations.add('jump', [9, 8], 5, true);
-    player.animations.add('fall', [11], 10, true);
-    player.animations.add('sleep', [5, 6], 0.6, true);
+    player.animations.add('jump',   [9, 8],  5,     true);
+    player.animations.add('fall',   [11],    10,    true);
+    player.animations.add('sleep',  [5, 6],  0.6,   true);
 
-
-    //  Finally some stars to collect
-    stars = game.add.group();
-
-    //  We will enable physics for any star that is created in this group
-    stars.enableBody = true;
+    
+    stars = game.add.group(); //  Finally some stars to collect
+    stars.enableBody = true; //  We will enable physics for any star that is created in this group
 
     //  Here we'll create 12 of them evenly spaced apart
     for (var i = 0; i < 12; i++) {
@@ -108,15 +87,10 @@ function create() {
 
 
     }
-
-    //  The score
-    scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
-
-    //  Our controls.
-    cursors = game.input.keyboard.createCursorKeys();
-
-
-
+    
+    scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' }); //  The score
+    
+    cursors = game.input.keyboard.createCursorKeys(); //  Our controls.
 
 }
 
@@ -132,9 +106,9 @@ function update() {
     game.physics.arcade.collide(player, platforms);
     game.physics.arcade.collide(stars, platforms);
     game.physics.arcade.collide(stars, stars);
-    game.physics.arcade.collide(player, stars);
+    //game.physics.arcade.collide(player, stars);
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-    //game.physics.arcade.overlap(player, stars, collectStar, null, this);
+    game.physics.arcade.overlap(player, stars, collectStar, null, this);
 
 
 
@@ -209,17 +183,14 @@ function update() {
         player.body.velocity.y = -350;
 
     }
-
-
 }
 
 function collectStar(player, star) {
 
     // Removes the star from the screen
-    //star.kill();
+    star.kill();
 
     //  Add and update the score
     score += 10;
     scoreText.text = 'Score: ' + score;
-
 }

@@ -40,7 +40,10 @@ function crearUsuario(nombre) {
     nombre = "jugador";
   }
   $.getJSON(url + 'crearUsuario/' + nombre, function (datos) {
-    mostrarInfoJugador(datos);
+    juego =  datos;
+		usuario = juego.usuarios[0];
+		informacionUsuario(usuario);
+		game = new Phaser.Game(800, 600, Phaser.AUTO, 'juegoId', { preload: preload, create: create, update: update });
   });
   //mostrar datos
 }
