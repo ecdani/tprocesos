@@ -26,6 +26,13 @@ app.get('/crearUsuario/:nombre',function(request,response){
 	response.send(this.juego);
 });
 
+app.get('/estadistica',function(request,response){
+	var contenido=fs.readFileSync("./estadistica.html");
+	response.setHeader("Content-type","text/html");
+	response.send(contenido);
+});
+
+
 console.log("Servidor escuchando en el puerto "+port);
 //app.listen(process.env.PORT || 1338);
 app.listen(1338,'localhost');

@@ -16,7 +16,8 @@ function Nivel(num){
 
 function Usuario(nombre){
     this.nombre=nombre;
-    this.nivel= undefined;
+    this.nivel= 1;
+    this.vidas = 3;
 }
 
 module.exports.Juego = Juego;

@@ -192,6 +192,6 @@ function collectStar(player, star) {
 
     //  Add and update the score
     score += 10;
-    scoreText.text = 'Score: ' + score;
+    //scoreText.text = 'Score: ' + score;
     $('#score').text(score);
 }

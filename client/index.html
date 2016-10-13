@@ -2,17 +2,17 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <title>Conquista Niveles Dani</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" >
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" >
-    <link href="css/cover.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
+	<meta charset="UTF-8" />
+	<title>Conquista Niveles Dani</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+	<link href="css/cover.css" rel="stylesheet">
+	<link href="css/style.css" rel="stylesheet">
 </head>
 
 <body>
-    <!--
+	<!--
     <h1>Juego conquista niveles</h1>
     <<h2>Procesos de I.Software - Jose Antonio Gallud</h2>
     <div class="container">
@@ -27,48 +27,70 @@
         </div>-->
 
 
- <div class="site-wrapper">
-      <div class="site-wrapper-inner">
-        <div class="cover-container">
-          <div class="masthead clearfix">
-            <div class="inner">
-              <h3 class="masthead-brand">Conquista Niveles</h3>
-              <nav>
-                <ul class="nav masthead-nav">
-                  <li class="active"><a href="#">Nuevo juego</a></li>
-                  <li><a href="#">Estadísticas</a></li>
-                  <li><a href="#">Info</a></li>
-                </ul>
-              </nav>
-            </div>
-          </div>
+	<div class="site-wrapper">
+		<div class="site-wrapper-inner">
+			<div class="cover-container">
+				<div class="masthead clearfix">
+					<div class="inner">
+						<h3 class="masthead-brand">Conquista Niveles</h3>
+						<nav>
+							<ul class="nav masthead-nav">
+								<li class="active"><a href="/">Nuevo juego</a></li>
+								<li><a href="/estadistica">Estadísticas</a></li>
+								<li><a href="#">Info</a></li>
+							</ul>
+						</nav>
+					</div>
+				</div>
+                <div class="cover" id="status">
+                    <div class="row">
+                    <div class="col-md-4">
+                        
+                    </div>
+                    <div class="col-md-1">
+                        <i class="fa fa-gamepad fa-2x" aria-hidden="true"></i><span id="inombre">0</span>
+                    </div>
+                    <div class="col-md-1">
+                        <i class="fa fa-star fa-2x" aria-hidden="true"></i><span id="score">0</span>
+                    </div>
+                    <div class="col-md-1">
+                        <i class="fa fa-trophy fa-2x" aria-hidden="true"></i><span id="nivel">0</span>
+                    </div>
+                    <div class="col-md-1">
+                        <i class="fa fa-heart fa-2x" aria-hidden="true"></i><span id="vidas">0</span>
+                    </div>
 
-          <div class="inner cover" id="control">
+                    <div class="col-md-4">
+                        
+                    </div>
+                    </div>
+				</div>
 
-            <h1 class="cover-heading">Juego conquista niveles</h1>
-            <p class="lead">Juego desarrollado durante la asignatura de Procesos de I.Software con Jose Antonio Gallud, para comenzar pulse Jugar!</p>
-            <p class="lead">
-              <a href="#" class="btn btn-lg btn-success" id="inicio">Jugar!</a>
-            </p>
-          </div>
+				<div class="inner cover" id="control">
 
-          <div class="mastfoot">
-            <div class="inner">
-              <p>Desarrollado por <a href="https://github.com/ecdani">Daniel Espinosa</a></p>
-            </div>
-          </div>
+					<h1 class="cover-heading">Juego conquista niveles</h1>
+					<p class="lead">Juego desarrollado durante la asignatura de Procesos de I.Software con Jose Antonio Gallud, para comenzar pulse Jugar!</p>
+					<p class="lead">
+						<a href="#" class="btn btn-lg btn-success" id="inicio">Jugar!</a>
+					</p>
+				</div>
+				<div class="mastfoot">
+					<div class="inner">
+						<p>Desarrollado por <a href="https://github.com/ecdani">Daniel Espinosa</a></p>
+					</div>
+				</div>
 
-        </div>
+			</div>
 
-      </div>
+		</div>
 
-    </div>
+	</div>
 
-        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-        <script type="text/javascript" src="lib/phaser.min.js"></script>
-        <script type="text/javascript" src="js/control.js"></script>
-        <script type="text/javascript" src="js/juego.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="lib/phaser.min.js"></script>
+	<script type="text/javascript" src="js/control.js"></script>
+	<script type="text/javascript" src="js/juego.js"></script>
 </body>
 
 </html>
