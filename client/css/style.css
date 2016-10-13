@@ -1,0 +1,11 @@
+#juegoId {
+    margin: auto;
+    width: 800px;
+    height: 600px;
+}
+input {
+  color: #333;
+}
+.container {
+    text-align: left;
+}

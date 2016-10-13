@@ -18,7 +18,7 @@ app.get("/",function(request,response){
 	response.send(contenido);
 });
 
-app.get('/crearUsuario/:nombre/',function(request,response){
+app.get('/crearUsuario/:nombre',function(request,response){
 	var usuario = new modelo.Usuario(request.params.nombre);
 	this.juego = new modelo.Juego();
 	this.juego.agregarNivel(new modelo.Nivel("1"));
@@ -27,5 +27,6 @@ app.get('/crearUsuario/:nombre/',function(request,response){
 });
 
 console.log("Servidor escuchando en el puerto "+port);
-app.listen(process.env.PORT || 1338);
+//app.listen(process.env.PORT || 1338);
+app.listen(1338,'localhost');
 

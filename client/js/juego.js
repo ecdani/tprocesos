@@ -88,7 +88,7 @@ function create() {
 
     }
     
-    scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' }); //  The score
+    //scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' }); //  The score
     
     cursors = game.input.keyboard.createCursorKeys(); //  Our controls.
 
@@ -193,4 +193,5 @@ function collectStar(player, star) {
     //  Add and update the score
     score += 10;
     scoreText.text = 'Score: ' + score;
+    $('#score').text(score);
 }

@@ -5,39 +5,70 @@
     <meta charset="UTF-8" />
     <title>Conquista Niveles Dani</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
-    <style>
-        #juegoId {
-            margin: auto;
-            width: 800px;
-            height: 600px;
-        }
-    </style>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" >
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" >
+    <link href="css/cover.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
 </head>
 
 <body>
+    <!--
+    <h1>Juego conquista niveles</h1>
+    <<h2>Procesos de I.Software - Jose Antonio Gallud</h2>
     <div class="container">
         <div class="row" id="control">
             <div id="cabecera"></div>
         </div>
         <div class="row">
-            <div id="juegoId">
-
-            </div>
+            <div id="juegoId"></div>
         </div>
         <div class="row">
             <div id="datos"></div>
+        </div>-->
+
+
+ <div class="site-wrapper">
+      <div class="site-wrapper-inner">
+        <div class="cover-container">
+          <div class="masthead clearfix">
+            <div class="inner">
+              <h3 class="masthead-brand">Conquista Niveles</h3>
+              <nav>
+                <ul class="nav masthead-nav">
+                  <li class="active"><a href="#">Nuevo juego</a></li>
+                  <li><a href="#">Estadísticas</a></li>
+                  <li><a href="#">Info</a></li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+
+          <div class="inner cover" id="control">
+
+            <h1 class="cover-heading">Juego conquista niveles</h1>
+            <p class="lead">Juego desarrollado durante la asignatura de Procesos de I.Software con Jose Antonio Gallud, para comenzar pulse Jugar!</p>
+            <p class="lead">
+              <a href="#" class="btn btn-lg btn-success" id="inicio">Jugar!</a>
+            </p>
+          </div>
+
+          <div class="mastfoot">
+            <div class="inner">
+              <p>Desarrollado por <a href="https://github.com/ecdani">Daniel Espinosa</a></p>
+            </div>
+          </div>
+
         </div>
 
+      </div>
+
+    </div>
+
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="lib/phaser.min.js"></script>
-        <script src="js/control.js"></script>
-        <script src="js/juego.js"></script>
-        <script type="text/javascript">
-        inicio();
-    </script>
+        <script type="text/javascript" src="js/control.js"></script>
+        <script type="text/javascript" src="js/juego.js"></script>
 </body>
 
 </html>
