@@ -34,6 +34,6 @@ app.get('/estadistica',function(request,response){
 
 
 console.log("Servidor escuchando en el puerto "+port);
-//app.listen(process.env.PORT || 1338);
-app.listen(1338,'localhost');
+app.listen(process.env.PORT || 1338);
+//app.listen(1338,'localhost');
 
