@@ -5,9 +5,11 @@ var host=config.host;
 var port=config.port;
 var exp=require("express");
 var app=exp();
+var mongo= require("mongodb");
 
 var modelo = require("./servidor/modelo.js");
 var juego;
+var usuariosCol;
 
 //app.use(app.router);
 app.use(exp.static(__dirname +"/client"));
@@ -37,3 +39,24 @@ console.log("Servidor escuchando en el puerto "+port);
 app.listen(process.env.PORT || 1338);
 //app.listen(1338,'localhost');
 
+var db = new mongo.Db("usuarioscn", new mongo.Server("127.0.0.0","27017",{}));
+
+db.open(function(error){
+	console.log("conectado a Mongo: usuarioscn");
+	db.collection("usuarios", function(err,col){
+		console.log("tenemos la colección");
+		usuariosCol=col;
+	});
+});
+
+insertar({nombre:"Pepe",email:"pe@pe.com",clave:"pepe"});
+
+function insertar(usu){
+	usuariosCol.insert(usu,function(err){
+		if(err){
+			console.log("error");
+		} else {
+			console.log("Nuevo usuario creado");
+		}
+	});
+}
