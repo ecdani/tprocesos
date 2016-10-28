@@ -4,6 +4,7 @@
   "description": "Gallud",
   "main": "node-express.js",
   "dependencies": {
+    "body-parser": "^1.15.2",
     "express": "^4.9.6",
     "fs": "^0.0.2",
     "mongodb": "^2.2.11",

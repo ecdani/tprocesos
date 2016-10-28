@@ -14,3 +14,8 @@ input {
 .container {
     text-align: left;
 }
+
+.autenticacionForm {
+    margin: auto;
+    width: 400px;
+}

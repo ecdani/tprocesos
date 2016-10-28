@@ -4,33 +4,71 @@ var url = "http://127.0.0.1:1338/";
 //Funciones que modifican el index
 
 
-$('#inicio').on('click', function () {
-    inicio();
-  });
+$('#btnRegistro').on('click', function () {
+  mostrarRegistro();
+});
 
-function inicio() {
-  mostrarCabecera();
-}
+$('#enlaceAutenticacion').on('click', function () {
+  mostrarAutenticacion();
+});
 
-function borrarControl() {
-  $('#control').remove();
-}
-
-function mostrarCabecera() {
-  //$('#cabecera').remove();
-  var nombre = "";
+function mostrarAutenticacion() {
+  var nombre = "", password = "";
   $('#control').empty();
   //$('#control').removeClass('cover');
   //$('#control').addClass('container');
-  
-  $('#control').append('<div id="cabecera"><h2>Para empezar danos un nombre </h2><form class="form-inline"><div class="form-group"><input class="form-control" type="text" id="nombre" placeholder="Introduce tu nombre"></div> <button type="button" id="nombreBtn" class="btn btn-primary">Enviar</button></form></div>');
-  $('#nombreBtn').on('click', function () {
-    nombre = $('#nombre').val();
-    console.dir(nombre);
-    crearUsuario(nombre);
-    $('#control').empty();
-    
-  });
+
+  $('#control').load('../autenticacion.html', funcionalidadAutenticacion);
+
+  function funcionalidadAutenticacion() {
+    $('#nombreBtn').on('click', function () {
+
+      nombre = $('#nombre').val();
+      password = $('#password').val();
+      //console.dir(nombre);
+      autenticarse(nombre, password);
+      $('#control').empty();
+
+    });
+  }
+}
+
+function mostrarRegistro() {
+  //$('#cabecera').remove();
+  var nombre = "", password = "";
+  $('#control').empty();
+  //$('#control').removeClass('cover');
+  //$('#control').addClass('container');
+
+  $('#control').load('../registro.html', funcionalidadRegistro);
+
+  function funcionalidadRegistro() {
+    $("#password, #validarpassword").keyup(checkPasswordMatch);
+
+    $('#nombreBtn').on('click', function () {
+
+      nombre = $('#nombre').val();
+      password = $('#password').val();
+      //console.dir(nombre);
+      crearUsuario(nombre, password);
+      $('#control').empty();
+
+    });
+  }
+}
+
+function checkPasswordMatch() {
+  var password = $("#password").val();
+  var confirmPassword = $("#validarpassword").val();
+
+  if (password != confirmPassword) {
+    $('#nombreBtn').prop("disabled", true);
+    $("#divCheckPasswordMatch").html("Las contraseñas no coinciden.");
+  } else {
+    $('#nombreBtn').prop("disabled", false);
+    $("#divCheckPasswordMatch").html("Las constraseñas coinciden");
+  }
+
 }
 
 function mostrarInfoJugador(datos) {
@@ -40,17 +78,36 @@ function mostrarInfoJugador(datos) {
 
 //Funciones de comunicación con el servidor
 
-function crearUsuario(nombre) {
+function crearUsuario(nombre, password) {
   if (nombre == "") {
     nombre = "jugador";
   }
-  $.getJSON('/crearUsuario/' + nombre, function (datos) {
-    juego = datos;
-		usuario = juego.usuarios[0];
-		game = new Phaser.Game(660, 600, Phaser.AUTO, 'control', { preload: preload, create: create, update: update });
-    informacionUsuario(usuario);
-  });
-  //mostrar datos
+  $.post("/crearUsuario", {
+    nombre: nombre,
+    password: password
+  },
+    function (data, status) {
+      //console.log(data);
+      juego = data;
+      usuario = juego.usuarios[0];
+      game = new Phaser.Game(660, 600, Phaser.AUTO, 'control', { preload: preload, create: create, update: update });
+      informacionUsuario(usuario);
+    });
+}
+
+function autenticarse(nombre, password) {
+
+  $.post("/autenticarse", {
+    nombre: nombre,
+    password: password
+  },
+    function (data, status) {
+      //console.log(data);
+      juego = data;
+      usuario = juego.usuarios[0];
+      game = new Phaser.Game(660, 600, Phaser.AUTO, 'control', { preload: preload, create: create, update: update });
+      informacionUsuario(usuario);
+    });
 }
 
 function informacionUsuario(usuario) {
