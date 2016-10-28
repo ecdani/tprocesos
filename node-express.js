@@ -5,7 +5,10 @@ var host=config.host;
 var port=config.port;
 var exp=require("express");
 var app=exp();
-var mongo= require("mongodb");
+//var MongoClient= require("mongodb"); // V 3.2.10
+var MongoClient = require('mongodb').MongoClient,
+  f = require('util').format,
+  assert = require('assert');
 
 var modelo = require("./servidor/modelo.js");
 var juego;
@@ -38,6 +41,26 @@ app.get('/estadistica',function(request,response){
 console.log("Servidor escuchando en el puerto "+port);
 app.listen(process.env.PORT || 1338);
 //app.listen(1338,'localhost');
+
+
+
+
+// Connection URL
+var url = 'mongodb://tprocesos:tprocesos@localhost:27017?authMechanism=SCRAM-SHA-1&authSource=myprojectdb';
+// Use connect method to connect to the Server
+MongoClient.connect(url, function(err, db) {
+  assert.equal(null, err);
+  console.log("Connected correctly to server");
+
+    db.collection('inserts').insertOne({a:1}, function(err, r) {
+    assert.equal(null, err);
+    assert.equal(1, r.insertedCount);
+
+
+  db.close();
+});
+
+
 
 var db = new mongo.Db("usuarioscn", new mongo.Server("127.0.0.0","27017",{}));
 
