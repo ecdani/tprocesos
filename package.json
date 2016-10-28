@@ -6,7 +6,7 @@
   "dependencies": {
     "express": "^4.9.6",
     "fs": "^0.0.2",
-    "mongodb": "^2.1.18",
+    "mongodb": "^2.2.11",
     "ntwitter": "^0.5.0",
     "underscore": "^1.7.0"
   },
