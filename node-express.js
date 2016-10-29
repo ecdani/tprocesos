@@ -2,7 +2,7 @@
 var fs = require("fs");
 var MongoClient = require('mongodb').MongoClient; // V 3.2.10
 
-var assert = require('assert');
+//var assert = require('assert');
 var exp = require("express");
 var bodyParser = require('body-parser');
 
