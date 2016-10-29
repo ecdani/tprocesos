@@ -16,6 +16,11 @@ function Nivel(num) {
 
 function Usuario(nombre) {
     this.nombre = nombre;
+    this.scoremaximo = 0;
+    this.partida = {}
+}
+
+function Partida(){
     this.nivel = 1;
     this.vidas = 3;
 }

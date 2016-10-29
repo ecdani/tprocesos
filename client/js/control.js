@@ -1,7 +1,21 @@
+//import * as bootState from "bootState";
 
-var url = "http://127.0.0.1:1338/";
 
-//Funciones que modifican el index
+/*
+var Main = function () { };
+Main.prototype = {
+  preload: function () {
+    game.load.script('bootState', 'js/bootState.js');
+  },
+
+  create: function () {
+    game.state.add('bootState', bootState);
+    game.state.start('bootState');
+  },
+  update: function(){}
+
+};*/
+
 
 
 $('#btnRegistro').on('click', function () {
@@ -66,7 +80,7 @@ function checkPasswordMatch() {
     $("#divCheckPasswordMatch").html("Las contraseñas no coinciden.");
   } else {
     $('#nombreBtn').prop("disabled", false);
-    $("#divCheckPasswordMatch").html("Las constraseñas coinciden");
+    $("#divCheckPasswordMatch").html("Las contraseñas coinciden");
   }
 
 }
@@ -90,8 +104,25 @@ function crearUsuario(nombre, password) {
       //console.log(data);
       juego = data;
       usuario = juego.usuarios[0];
-      game = new Phaser.Game(660, 600, Phaser.AUTO, 'control', { preload: preload, create: create, update: update });
+
+      game = new Phaser.Game(660, 600, Phaser.AUTO, 'control');
+      game.state.add('Main', Main);
+      game.state.start('Main');
+
+
       informacionUsuario(usuario);
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+      switch (jqXHR.status) {
+        case 409:
+          console.log(jqXHR);
+          $("#divCheckPasswordMatch").html("El nombre de usuario ya existe.");
+          break;
+        case 500:
+          console.log(jqXHR);
+          $("#divCheckPasswordMatch").html("Error en el servidor.");
+          break;
+        default:
+      }
     });
 }
 
@@ -106,7 +137,16 @@ function autenticarse(nombre, password) {
       console.log(status);
       juego = data;
       usuario = juego.usuarios[0];
-      game = new Phaser.Game(660, 600, Phaser.AUTO, 'control', { preload: preload, create: create, update: update });
+      //game = new Phaser.Game(660, 600, Phaser.AUTO, 'control', { preload: preload, create: create, update: update });
+
+      game = new Phaser.Game(660, 600, Phaser.AUTO, 'control',bootState );
+      //game.load.script('bootState', 'js/bootState.js');
+      //game.state.add('bootState', bootState);
+      //game.state.start('bootState');
+      /*game.state.add('Main', Main);
+      game.state.start('Main');*/
+
+
       informacionUsuario(usuario);
     }).fail(function (jqXHR, textStatus, errorThrown) {
       switch (jqXHR.status) {
