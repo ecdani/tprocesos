@@ -27,7 +27,7 @@ function mostrarAutenticacion() {
       password = $('#password').val();
       //console.dir(nombre);
       autenticarse(nombre, password);
-      $('#control').empty();
+      //$('#control').empty();
 
     });
   }
@@ -102,11 +102,28 @@ function autenticarse(nombre, password) {
     password: password
   },
     function (data, status) {
-      //console.log(data);
+      $('#control').empty();
+      console.log(status);
       juego = data;
       usuario = juego.usuarios[0];
       game = new Phaser.Game(660, 600, Phaser.AUTO, 'control', { preload: preload, create: create, update: update });
       informacionUsuario(usuario);
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+      switch (jqXHR.status) {
+        case 404:
+          console.log(jqXHR);
+          $("#autenticacionInfo").html("Usuario no encontrado.");
+          break;
+        case 500:
+          console.log(jqXHR);
+          $("#autenticacionInfo").html("Error en el servidor.");
+          break;
+        case 401:
+          console.log(jqXHR);
+          $("#autenticacionInfo").html("Contraseña incorrecta.");
+          break;
+        default:
+      }
     });
 }
 

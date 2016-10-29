@@ -52,14 +52,20 @@ app.post('/autenticarse', function (request, response) {
 
 	cargarUsuario(nombre, callback);
 
-	function callback(doc) {
-		if (doc.password == password) {
-			this.juego = new modelo.Juego();
-			this.juego.agregarNivel(new modelo.Nivel("1"));
-			this.juego.agregarUsuario(doc.usuario);
-			response.send(this.juego);
+	function callback(err, doc) {
+		if (err) {
+			response.status(500).send('Error en el servidor.');
+		} else if (doc) {
+			if (doc.password == password) {
+				this.juego = new modelo.Juego();
+				this.juego.agregarNivel(new modelo.Nivel("1"));
+				this.juego.agregarUsuario(doc.usuario);
+				response.send(this.juego);
+			} else {
+				response.status(401).send('Error de contraseña.');
+			}
 		} else {
-			response.status(401).send('Usuario no encontrado.');
+			response.status(404).send('Usuario no encontrado');
 		}
 	}
 });
@@ -86,12 +92,12 @@ app.listen(process.env.PORT || 1338);
 function insertarUsuario(usuario, password) {
 	MongoClient.connect(url, conexion);
 	function conexion(err, db) {
-		assert.equal(null, err);
+		//assert.equal(null, err);
 
 		db.collection('usuarios').insertOne({ usuario: usuario, password: password }, callback);
 		function callback(err, r) { // Está anidada, para poder acceder a db.
-			assert.equal(null, err);
-			assert.equal(1, r.insertedCount);
+			//assert.equal(null, err);
+			//assert.equal(1, r.insertedCount);
 			db.close();
 		}
 	}
@@ -99,13 +105,13 @@ function insertarUsuario(usuario, password) {
 
 function cargarUsuario(nombre, callback) {
 	function conexion(err, db) {
-		assert.equal(null, err);
-		function callback(err, r) {
-			assert.equal(null, err);
-			callback(r);
+		//assert.equal(null, err);
+		function findOneCallback(err, r) {
+			//assert.equal(null, err);
+			callback(err, r);
 			db.close();
 		}
-		db.collection('usuarios').findOne({ 'usuario.nombre': nombre }, callback);
+		db.collection('usuarios').findOne({ 'usuario.nombre': nombre }, findOneCallback);
 	}
 	MongoClient.connect(url, conexion);
 }
