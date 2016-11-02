@@ -46,6 +46,24 @@ app.post('/crearUsuario', function (request, response) {
 	response.send(this.juego);
 });
 
+app.post('/editarUsuario', function (request, response) {
+	var nombre = request.body.nombre;
+	var password = request.body.password;
+	console.log(nombre)
+	console.log(password)
+
+	//var usuario = new modelo.Usuario(nombre);
+	editarUsuario(nombre, password, callback);
+
+	function callback(err, doc) {
+		if (err) {
+			response.status(500).send('Error en el servidor.');
+		} else {
+			response.status(204).send('Usuario actualizado');
+		}
+	}
+});
+
 app.post('/autenticarse', function (request, response) {
 	var nombre = request.body.nombre;
 	var password = request.body.password;
@@ -106,12 +124,76 @@ function insertarUsuario(usuario, password) {
 function cargarUsuario(nombre, callback) {
 	function conexion(err, db) {
 		//assert.equal(null, err);
-		function findOneCallback(err, r) {
+		function cargarUsuariofindOneCallback(err, r) {
 			//assert.equal(null, err);
 			callback(err, r);
 			db.close();
 		}
-		db.collection('usuarios').findOne({ 'usuario.nombre': nombre }, findOneCallback);
+		db.collection('usuarios').findOne({ 'usuario.nombre': nombre }, cargarUsuariofindOneCallback);
 	}
 	MongoClient.connect(url, conexion);
+}
+
+function editarUsuario(nombre,password, callback) {
+	MongoClient.connect(url, conexion);
+	function conexion(err, db) {
+		//assert.equal(null, err);
+		console.log("Nombre:"+nombre);
+		db.collection('usuarios').findOne({ 'usuario.nombre': nombre }, findOneCallback);
+		function findOneCallback(err, r) {
+			console.log(err);
+			r.password = password;
+			r.nombre = nombre;
+			db.collection('usuarios').update({ 'usuario.nombre': nombre },r,updateCallback);
+			function updateCallback(err,r) {
+				callback(err, r);
+				db.close();
+			}
+		}
+	}
+}
+
+
+
+app.put("/actualizarUsuario",function(request,response){
+ //var uid=request.params.uid;
+ //var email=request.body.email;
+ var uid=request.body.uid;
+ //var nombre=request.body.nombre;
+ //var password=request.body.newpass;
+ //var nivel=parseInt(request.body.nivel);
+ var json={'email':undefined};
+ var usu=juego.obtenerUsuario(uid);
+ var usuario=comprobarCambios(request.body,usu);
+ usuariosCol.update({_id:ObjectID(uid)},usuario,function(err,result){
+   console.log(result);
+   if (result.result.nModified==0){
+     console.log("No se pudo actualizar");
+     response.send(json);
+   }
+   else{ 
+     usuariosCol.find({_id:ObjectID(uid)}).toArray(function(error,usr){
+      if (!error){
+         if (usr.length!=0){
+           json=usr[0];
+         } 
+      }
+     console.log("Usuario modificado");
+     console.log(json);
+     response.send(json);
+    });
+  }
+ });
+});
+function comprobarCambios(body,usu){
+ if (body.email!=usu.email && body.email!=""){
+   usu.email=body.email;
+ }
+ if (body.newpass!=usu.password && body.newpass!=""){
+   usu.password=body.newpass;
+ }
+   if (body.nombre!=usu.nombre && body.nombre!=""){
+   usu.nombre=body.nombre;
+ }
+ return usu;
 }

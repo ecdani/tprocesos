@@ -1,30 +1,10 @@
-//import * as bootState from "bootState";
-
-
-/*
-var Main = function () { };
-Main.prototype = {
-  preload: function () {
-    game.load.script('bootState', 'js/bootState.js');
-  },
-
-  create: function () {
-    game.state.add('bootState', bootState);
-    game.state.start('bootState');
-  },
-  update: function(){}
-
-};*/
 
 
 
-$('#btnRegistro').on('click', function () {
-  mostrarRegistro();
-});
+$('#btnRegistro').on('click', mostrarRegistro);
 
-$('#enlaceAutenticacion').on('click', function () {
-  mostrarAutenticacion();
-});
+$('.enlaceAutenticacion').on('click', mostrarAutenticacion);
+
 
 function mostrarAutenticacion() {
   var nombre = "", password = "";
@@ -71,6 +51,30 @@ function mostrarRegistro() {
   }
 }
 
+function mostrarEdicion() {
+  //$('#cabecera').remove();
+  var nombre = "", password = "";
+  $('#control').empty();
+  //$('#control').removeClass('cover');
+  //$('#control').addClass('container');
+
+  $('#control').load('../edicionUsuario.html', funcionalidadEdicion);
+
+  function funcionalidadEdicion() {
+    $("#password, #validarpassword").keyup(checkPasswordMatch);
+
+    $('#nombreBtn').on('click', function () {
+
+      nombre = $('#nombre').val();
+      password = $('#password').val();
+      //console.dir(nombre);
+      editarUsuario(nombre, password);
+      //$('#control').empty();
+
+    });
+  }
+}
+
 function checkPasswordMatch() {
   var password = $("#password").val();
   var confirmPassword = $("#validarpassword").val();
@@ -105,10 +109,16 @@ function crearUsuario(nombre, password) {
       juego = data;
       usuario = juego.usuarios[0];
 
+      $('.enlaceAutenticacion').html('Editar cuenta');
+      $( ".enlaceAutenticacion" ).unbind();
+      
+      $('.enlaceAutenticacion').on('click', mostrarEdicion);
+      
       game = new Phaser.Game(660, 600, Phaser.AUTO, 'control');
       game.state.add('Main', Main);
       game.state.start('Main');
 
+     
 
       informacionUsuario(usuario);
     }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -139,6 +149,11 @@ function autenticarse(nombre, password) {
       usuario = juego.usuarios[0];
       //game = new Phaser.Game(660, 600, Phaser.AUTO, 'control', { preload: preload, create: create, update: update });
 
+      $('.enlaceAutenticacion').html('Editar cuenta');
+      $( ".enlaceAutenticacion" ).unbind();
+      
+      $('.enlaceAutenticacion').on('click', mostrarEdicion);
+
       game = new Phaser.Game(660, 600, Phaser.AUTO, 'control',bootState );
       //game.load.script('bootState', 'js/bootState.js');
       //game.state.add('bootState', bootState);
@@ -148,6 +163,7 @@ function autenticarse(nombre, password) {
 
 
       informacionUsuario(usuario);
+
     }).fail(function (jqXHR, textStatus, errorThrown) {
       switch (jqXHR.status) {
         case 404:
@@ -166,6 +182,34 @@ function autenticarse(nombre, password) {
       }
     });
 }
+
+function editarUsuario(nombre, password) {
+
+  $.post("/editarUsuario", {
+    nombre: nombre,
+    password: password
+  },
+    function (data, status) {
+      //console.log(data);
+       $("#divCheckPasswordMatch").html("Usuario actualizado.");
+
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+      switch (jqXHR.status) {
+        case 409:
+          console.log(jqXHR);
+          $("#divCheckPasswordMatch").html("El nombre de usuario ya existe.");
+          break;
+        case 500:
+          console.log(jqXHR);
+          $("#divCheckPasswordMatch").html("Error en el servidor.");
+          break;
+        default:
+      }
+    });
+}
+
+
+
 
 function informacionUsuario(usuario) {
   $('#status').show();
