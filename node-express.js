@@ -77,7 +77,8 @@ app.post('/autenticarse', function (request, response) {
 			if (doc.password == password) {
 				this.juego = new modelo.Juego();
 				this.juego.agregarNivel(new modelo.Nivel("1"));
-				this.juego.agregarUsuario(doc.usuario);
+				console.log(doc);
+				this.juego.agregarUsuario(doc); /** PODRIA CAMIAR EN crear */
 				response.send(this.juego);
 			} else {
 				response.status(401).send('Error de contraseña.');
@@ -154,8 +155,16 @@ function editarUsuario(nombre,password, callback) {
 }
 
 
+/*Carga niveles desde JSON */
+app.get('/pedirNivel/:uid',function(request, response) {
+	var uid = request.params.uid;
+	var usuario = juego.obtnerUsuario(uid);
+	var json = {'nivel':-1}
+	/** To be continued..... */
+});
 
-app.put("/actualizarUsuario",function(request,response){
+/* Ejemplo Gallud */
+app.put("/actualizarUsuario",function(request,response) {
  //var uid=request.params.uid;
  //var email=request.body.email;
  var uid=request.body.uid;

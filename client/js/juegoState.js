@@ -2,8 +2,8 @@
 //var game = new Phaser.Game(800,600, Phaser.AUTO, 'juegoId', { preload: preload, create: create, update: update });
 //import * as control from "control";
 
-juegoState = function () { 
-    var player;
+juegoState = function () {
+var player;
 var platforms;
 var cursors;
 
@@ -98,6 +98,25 @@ create: function() {
     
     cursors = game.input.keyboard.createCursorKeys(); //  Our controls.
 
+},
+
+/* Generacion de niveles a partir de JSON - Gallud */
+pedirNivel: function() {
+    var usr = JOSN.parse($.cookie("usr"));
+    var uid = usr_id;
+    if (uid!= undefined) {
+        $getJSON(url+"pedirNivel/"+uid,function(data){
+            crearNivel(data);
+        })
+    }
+},
+
+crearNivel: function (data) {
+    if (data.nivel< 0) {
+        noHayNiveles();
+    } else {
+        /** OMG está todo el juego */
+    }
 },
 
 sleep: function () {
