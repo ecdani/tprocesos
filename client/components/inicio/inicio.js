@@ -1,11 +1,12 @@
 
-$.ajaxSetup({ cache: true });
+$.ajaxSetup({ cache: false, async: true });
 
-checkCookie();
 
 $('#btnRegistro').on('click', mostrarRegistro);
 
 $('.enlaceAutenticacion').on('click', mostrarAutenticacion);
+
+checkCookie();
 
 
 function checkCookie() {
@@ -14,6 +15,8 @@ function checkCookie() {
   if (usuario) {
     usuario = $.parseJSON(usuario)
     autenticarse(usuario.nombre, usuario.password);
+  } else {
+    console.log("No cookie");
   }
 }
 

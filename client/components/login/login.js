@@ -4,8 +4,11 @@
  */
 function loginExec() {
     $('#nombreBtn').on('click', function (event) {
-        nombre = $('#nombre').val();
-        password = $('#password').val();
+        event.preventDefault();
+        var nombre = $('#nombre').val();
+        var password = $('#password').val();
         autenticarse(nombre, password);
+        
+        
     });
 }

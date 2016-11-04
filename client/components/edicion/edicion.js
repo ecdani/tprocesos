@@ -9,7 +9,8 @@ function edicionExec() {
 
     $("#password, #validarpassword").keyup(checkPasswordMatch);
 
-    $('#nombreBtn').on('click', function() {
+    $('#nombreBtn').on('click', function(event) {
+        event.preventDefault();
         nombre = $('#nombre').val();
         password = $('#password').val();
         editarUsuario(nombre, password);
@@ -24,6 +25,7 @@ function editarUsuario(nombre, password) {
         nombre: nombre,
         password: password
     }, function(data, status) {
+        $.cookie("usuario", JSON.stringify(data));
         $("#divCheckPasswordMatch").html("Usuario actualizado.");
 
     }).fail(function(jqXHR, textStatus, errorThrown) {

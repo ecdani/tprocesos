@@ -59,7 +59,7 @@ app.post('/editarUsuario', function (request, response) {
 		if (err) {
 			response.status(500).send('Error en el servidor.');
 		} else {
-			response.status(204).send('Usuario actualizado');
+			response.status(204).send(doc);
 		}
 	}
 });
@@ -77,8 +77,8 @@ app.post('/autenticarse', function (request, response) {
 			if (doc.password == password) {
 				this.juego = new modelo.Juego();
 				this.juego.agregarNivel(new modelo.Nivel("1"));
-				console.log(doc);
 				this.juego.agregarUsuario(doc); /** PODRIA CAMIAR EN crear */
+				
 				response.send(this.juego);
 			} else {
 				response.status(401).send('Error de contraseña.');
@@ -146,7 +146,7 @@ function editarUsuario(nombre,password, callback) {
 			r.password = password;
 			r.nombre = nombre;
 			db.collection('usuarios').update({ 'usuario.nombre': nombre },r,updateCallback);
-			function updateCallback(err,r) {
+			function updateCallback(err,c) {
 				callback(err, r);
 				db.close();
 			}

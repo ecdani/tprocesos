@@ -3,8 +3,8 @@
 function creacionExec() {
     $("#password, #validarpassword").keyup(checkPasswordMatch);
 
-    $('#nombreBtn').on('click', function() {
-
+    $('#nombreBtn').on('click', function(event) {
+        event.preventDefault();
         nombre = $('#nombre').val();
         password = $('#password').val();
         //console.dir(nombre);
