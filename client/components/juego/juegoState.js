@@ -18,10 +18,10 @@ var timer;
 
 juegoState.prototype = {
  preload: function() {
-    game.load.image('sky', 'assets/sky.png');
-    game.load.image('ground', 'assets/platform.png');
-    game.load.image('star', 'assets/pangball.png');
-    game.load.spritesheet('dude', 'assets/neko.png', 32, 32);
+    game.load.image('sky', '../components/juego/img/sky.png');
+    game.load.image('ground', '../components/juego/img/platform.png');
+    game.load.image('star', '../components/juego/img/pangball.png');
+    game.load.spritesheet('dude', '../components/juego/img/neko.png', 32, 32);
 },
 
 

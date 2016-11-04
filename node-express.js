@@ -28,7 +28,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
  */
 
 app.get("/", function (request, response) {
-	var contenido = fs.readFileSync("./index.html");
+	var contenido = fs.readFileSync("./client/components/inicio/inicio.html");
 	response.setHeader("Content-type", "text/html");
 	response.send(contenido);
 });
@@ -90,7 +90,7 @@ app.post('/autenticarse', function (request, response) {
 });
 
 app.get('/estadistica', function (request, response) {
-	var contenido = fs.readFileSync("./estadistica.html");
+	var contenido = fs.readFileSync("./client/components/estadistica/estadistica.html");
 	response.setHeader("Content-type", "text/html");
 	response.send(contenido);
 });
