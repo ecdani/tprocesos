@@ -1,16 +1,15 @@
-//var game = new Phaser.Game(800,600, Phaser.AUTO, 'juegoId', { preload: preload, create: create, update: update });
 
-
-
+/**
+ * Ejecutar el juego
+ */
 function bootStateExec(usuario) {
     $('#control').empty();
     game = new Phaser.Game(660, 600, Phaser.AUTO, 'control', bootState);
-    $('#status').load('../components/juego/status.html');
-    console.dir("BootstateExecUsuario");
-    console.dir(usuario);
-    $('#nivel').html(usuario.nivel)
-    $('#inombre').html(usuario.nombre)
-    $('#vidas').html(usuario.vidas)
+    $('#status').load('../components/juego/status.html', function() {
+        $('#nivel').html(usuario.nivel)
+        $('#inombre').html(usuario.nombre)
+        $('#vidas').html(usuario.vidas)
+    });
 }
 
 

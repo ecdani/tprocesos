@@ -30,11 +30,11 @@ function autenticarse(nombre, password) {
     $.post("/autenticarse", {
         nombre: nombre,
         password: password
-    },function(data, status) {
+    }, function(data, status) {
         console.log("Exito Autenticacion");
         callbackAutenticarse(data, status);
     }).fail(function(jqXHR, textStatus, errorThrown) {
-        
+
         switch (jqXHR.status) {
             case 404:
                 console.log(jqXHR);
@@ -64,11 +64,10 @@ function callbackAutenticarse(data, status) {
     juego = data;
     var usuario = juego.usuarios[0];
 
-    $('.enlaceAutenticacion').html('Editar cuenta');
-    $('.enlaceAutenticacion').unbind();
-    $('.enlaceAutenticacion').on('click', mostrarEdicion);
-    $('#logoutLink').show();
-    $('#logoutLink').on('click', logout);
+    $('.enlaceCreacion').hide();
+    $('.enlaceAutenticacion').hide();
+    $('.enlaceLogout').show();
+    $('.enlaceEdicion').show();
 
     $.cookie("usuario", JSON.stringify(usuario));
 
@@ -79,6 +78,7 @@ function callbackAutenticarse(data, status) {
  * Muestra la edición
  */
 function mostrarEdicion(event) {
+    game.destroy();
     $.when(
         $('#control').load('../components/edicion/edicion.html'),
         $.getScript("../components/edicion/edicion.js")).then(function() {
@@ -102,7 +102,15 @@ function mostrarJuego(usuario) {
  * Logout
  */
 function logout() {
+    game.destroy();
     $.removeCookie("usuario");
-    $('#control').load('../components/inicio/intro.html');
+    $('#control').load('../components/inicio/intro.html', function() {
+        $('#enlaceCreacion').on('click', mostrarCreacion);
+        $('#enlaceAutenticacion').on('click', mostrarAutenticacion);
+    });
     $('#status').empty();
+    $('.enlaceLogout').hide();
+    $('.enlaceEdicion').hide();
+    $('.enlaceCreacion').show();
+    $('.enlaceAutenticacion').show();
 }
