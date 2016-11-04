@@ -67,6 +67,8 @@ function callbackAutenticarse(data, status) {
     $('.enlaceAutenticacion').html('Editar cuenta');
     $('.enlaceAutenticacion').unbind();
     $('.enlaceAutenticacion').on('click', mostrarEdicion);
+    $('#logoutLink').show();
+    $('#logoutLink').on('click', logout);
 
     $.cookie("usuario", JSON.stringify(usuario));
 
@@ -94,4 +96,13 @@ function mostrarJuego(usuario) {
         $.getScript("../components/juego/bootState.js")).then(function() {
             bootStateExec(usuario);
         });
+}
+
+/**
+ * Logout
+ */
+function logout() {
+    $.removeCookie("usuario");
+    $('#control').load('../components/inicio/intro.html');
+    $('#status').empty();
 }

@@ -2,7 +2,7 @@
 $.ajaxSetup({ cache: false, async: true });
 
 
-$('#btnRegistro').on('click', mostrarRegistro);
+$('.enlaceRegistro').on('click', mostrarRegistro);
 
 $('.enlaceAutenticacion').on('click', mostrarAutenticacion);
 
@@ -17,6 +17,7 @@ function checkCookie() {
     autenticarse(usuario.nombre, usuario.password);
   } else {
     console.log("No cookie");
+    $('#control').load('../components/inicio/intro.html');
   }
 }
 

@@ -5,7 +5,7 @@
 function bootStateExec(usuario) {
     $('#control').empty();
     game = new Phaser.Game(660, 600, Phaser.AUTO, 'control', bootState);
-    $('#status').show();
+    $('#status').load('../components/juego/status.html');
     console.dir("BootstateExecUsuario");
     console.dir(usuario);
     $('#nivel').html(usuario.nivel)

@@ -111,12 +111,9 @@ app.listen(process.env.PORT || 1338);
 function insertarUsuario(usuario, password) {
 	MongoClient.connect(url, conexion);
 	function conexion(err, db) {
-		//assert.equal(null, err);
 
 		db.collection('usuarios').insertOne({ usuario: usuario, password: password }, callback);
 		function callback(err, r) { // Está anidada, para poder acceder a db.
-			//assert.equal(null, err);
-			//assert.equal(1, r.insertedCount);
 			db.close();
 		}
 	}
@@ -124,9 +121,8 @@ function insertarUsuario(usuario, password) {
 
 function cargarUsuario(nombre, callback) {
 	function conexion(err, db) {
-		//assert.equal(null, err);
 		function cargarUsuariofindOneCallback(err, r) {
-			//assert.equal(null, err);
+
 			callback(err, r);
 			db.close();
 		}
