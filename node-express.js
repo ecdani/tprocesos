@@ -15,7 +15,7 @@ var app = exp();
 
 var url = 'mongodb://tprocesos:tprocesos@ds135577.mlab.com:35577/procesos-gallud';
 var juego;
-var usuariosCol;
+var db;
 
 //app.use(app.router);
 app.use(exp.static(__dirname + "/client"));
@@ -37,7 +37,7 @@ app.post('/crearUsuario', function (request, response) {
 	var nombre = request.body.nombre;
 	var password = request.body.password;
 
-	var usuario = new modelo.Usuario(nombre,password);
+	var usuario = new modelo.Usuario(nombre, password);
 	insertarUsuario(usuario);
 
 	this.juego = new modelo.Juego();
@@ -49,24 +49,24 @@ app.post('/crearUsuario', function (request, response) {
 app.post('/editarUsuario', function (request, response) {
 	var nombre = request.body.nombre;
 	var password = request.body.password;
-	console.log("CallbackEditar,Nombre:"+nombre)
-	console.log("CallbackEditar,Pass:"+password)
+	console.log("CallbackEditar,Nombre:" + nombre)
+	console.log("CallbackEditar,Pass:" + password)
 
-	var usuario = new modelo.Usuario(nombre,password);
+	var usuario = new modelo.Usuario(nombre, password);
 	editarUsuario(usuario, callback);
 
 	function callback(err, doc) {
 		if (err) {
 			response.status(500).send('Error en el servidor.');
 		} else {
-			response.status(204).send(doc);
+			response.send(doc);
 		}
 	}
 });
 
 app.post('/borrarUsuario', function (request, response) {
 	var nombre = request.body.nombre;
-	console.log("CallbackBorrar,Nombre:"+nombre)
+	console.log("CallbackBorrar,Nombre:" + nombre)
 	borrarUsuario(nombre, callback);
 	function callback(err, doc) {
 		if (err) {
@@ -91,7 +91,7 @@ app.post('/autenticarse', function (request, response) {
 				this.juego = new modelo.Juego();
 				this.juego.agregarNivel(new modelo.Nivel("1"));
 				this.juego.agregarUsuario(doc); /** PODRIA CAMIAR EN crear */
-				
+
 				response.send(this.juego);
 			} else {
 				response.status(401).send('Error de contraseña.');
@@ -116,6 +116,10 @@ app.get('/estadistica', function (request, response) {
 console.log("Servidor escuchando en el puerto " + port);
 app.listen(process.env.PORT || 1338);
 
+MongoClient.connect(url, conexion);
+function conexion(err, base) {
+	db = base;
+}
 
 /*******************************
  * Funciones de Mongo DB       *
@@ -125,12 +129,8 @@ app.listen(process.env.PORT || 1338);
  * Insertar usuario
  */
 function insertarUsuario(usuario) {
-	MongoClient.connect(url, conexion);
-	function conexion(err, db) {
-		db.collection('usuarios').insertOne( usuario , callback);
-		function callback(err, r) { // Está anidada, para poder acceder a db.
-			db.close();
-		}
+	db.collection('usuarios').insertOne(usuario, callback);
+	function callback(err, r) {
 	}
 }
 
@@ -138,13 +138,9 @@ function insertarUsuario(usuario) {
  * Cargar usuario
  */
 function cargarUsuario(nombre, callback) {
-	MongoClient.connect(url, conexion);
-	function conexion(err, db) {
-		db.collection('usuarios').findOne({ 'nombre': nombre }, cargarUsuariofindOneCallback);
-		function cargarUsuariofindOneCallback(err, r) {
-			callback(err, r);
-			db.close();
-		}	
+	db.collection('usuarios').findOne({ 'nombre': nombre }, cargarUsuariofindOneCallback);
+	function cargarUsuariofindOneCallback(err, r) {
+		callback(err, r);
 	}
 }
 
@@ -152,89 +148,77 @@ function cargarUsuario(nombre, callback) {
  * Editar usuario
  */
 function editarUsuario(usuario, callback) {
-
-	MongoClient.connect(url, conexion);
-	function conexion(err, db) {
-		console.log("Edicion del usuaro nombre:"+usuario.nombre);
-		db.collection('usuarios').findOne({ 'nombre': usuario.nombre }, findOneCallback);
-		function findOneCallback(err, r) {
-			console.log(r);
-			r.password = usuario.password; // Solo se edita la password de momento y buscamos por nombre.
-			db.collection('usuarios').update({ 'nombre': usuario.nombre },r,updateCallback);
-			
-			function updateCallback(err,c) {
-				//error = err;
-				//u = new modelo.Usuario()
-				callback(err, usuario);
-				db.close();
-			}
-		}
+	console.log("Edicion del usuaro nombre:" + usuario.nombre);
+	db.collection('usuarios').findOneAndUpdate({ 'nombre': usuario.nombre }, { $set: { 'password': usuario.password } }, { returnOriginal: false }, findOneAndUpdateCallback);
+	function findOneAndUpdateCallback(err, r) {
+		console.log("Resultado nueva edicion");
+		console.log(r);
+		callback(err, r.value);
 	}
 }
 
+/**
+ * Borrar usuario
+ */
 function borrarUsuario(nombre, callback) {
-
-	MongoClient.connect(url, conexion);
-	function conexion(err, db) {
-		console.log("Borrado del usuario nombre:"+nombre);
-		db.collection('usuarios').deleteOne({ 'nombre': nombre }, deleteOneCallback);
-		function deleteOneCallback(err, r) {
-			console.log(r);
-			callback(err,r);
-		}
+	console.log("Borrado del usuario nombre:" + nombre);
+	db.collection('usuarios').deleteOne({ 'nombre': nombre }, deleteOneCallback);
+	function deleteOneCallback(err, r) {
+		console.log(r);
+		callback(err, r);
 	}
 }
 
 // Gallud ***************************************************************************************
 /*Carga niveles desde JSON */
 
-app.get('/pedirNivel/:uid',function(request, response) {
+app.get('/pedirNivel/:uid', function (request, response) {
 	var uid = request.params.uid;
 	var usuario = juego.obtnerUsuario(uid);
-	var json = {'nivel':-1}
+	var json = { 'nivel': -1 }
 	/** To be continued..... */
 });
 
 /* Ejemplo Gallud */
-app.put("/actualizarUsuario",function(request,response) {
- //var uid=request.params.uid;
- //var email=request.body.email;
- var uid=request.body.uid;
- //var nombre=request.body.nombre;
- //var password=request.body.newpass;
- //var nivel=parseInt(request.body.nivel);
- var json={'email':undefined};
- var usu=juego.obtenerUsuario(uid);
- var usuario=comprobarCambios(request.body,usu);
- usuariosCol.update({_id:ObjectID(uid)},usuario,function(err,result){
-   console.log(result);
-   if (result.result.nModified==0){
-     console.log("No se pudo actualizar");
-     response.send(json);
-   }
-   else{ 
-     usuariosCol.find({_id:ObjectID(uid)}).toArray(function(error,usr){
-      if (!error){
-         if (usr.length!=0){
-           json=usr[0];
-         } 
-      }
-     console.log("Usuario modificado");
-     console.log(json);
-     response.send(json);
-    });
-  }
- });
+app.put("/actualizarUsuario", function (request, response) {
+	//var uid=request.params.uid;
+	//var email=request.body.email;
+	var uid = request.body.uid;
+	//var nombre=request.body.nombre;
+	//var password=request.body.newpass;
+	//var nivel=parseInt(request.body.nivel);
+	var json = { 'email': undefined };
+	var usu = juego.obtenerUsuario(uid);
+	var usuario = comprobarCambios(request.body, usu);
+	usuariosCol.update({ _id: ObjectID(uid) }, usuario, function (err, result) {
+		console.log(result);
+		if (result.result.nModified == 0) {
+			console.log("No se pudo actualizar");
+			response.send(json);
+		}
+		else {
+			usuariosCol.find({ _id: ObjectID(uid) }).toArray(function (error, usr) {
+				if (!error) {
+					if (usr.length != 0) {
+						json = usr[0];
+					}
+				}
+				console.log("Usuario modificado");
+				console.log(json);
+				response.send(json);
+			});
+		}
+	});
 });
-function comprobarCambios(body,usu){
- if (body.email!=usu.email && body.email!=""){
-   usu.email=body.email;
- }
- if (body.newpass!=usu.password && body.newpass!=""){
-   usu.password=body.newpass;
- }
-   if (body.nombre!=usu.nombre && body.nombre!=""){
-   usu.nombre=body.nombre;
- }
- return usu;
+function comprobarCambios(body, usu) {
+	if (body.email != usu.email && body.email != "") {
+		usu.email = body.email;
+	}
+	if (body.newpass != usu.password && body.newpass != "") {
+		usu.password = body.newpass;
+	}
+	if (body.nombre != usu.nombre && body.nombre != "") {
+		usu.nombre = body.nombre;
+	}
+	return usu;
 }

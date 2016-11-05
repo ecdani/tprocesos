@@ -32,6 +32,8 @@ function editarUsuario(nombre, password) {
         nombre: nombre,
         password: password
     }, function(data, status) {
+        console.log('El usuario que llega de la edicion:')
+        console.log(data);
         $.cookie("usuario", JSON.stringify(data));
         $("#divCheckPasswordMatch").html("Usuario actualizado.");
 
