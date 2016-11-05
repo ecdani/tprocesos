@@ -16,6 +16,12 @@ function edicionExec() {
         password = $('#password').val();
         editarUsuario(nombre, password);
     });
+
+    $('#borrarBtn').on('click', function(event) {
+        event.preventDefault();
+        nombre = $('#nombre').val();;
+        borrarUsuario(nombre);
+    });
 }
 
 /**
@@ -35,6 +41,27 @@ function editarUsuario(nombre, password) {
                 console.log(jqXHR);
                 $("#divCheckPasswordMatch").html("El nombre de usuario ya existe.");
                 break;
+            case 500:
+                console.log(jqXHR);
+                $("#divCheckPasswordMatch").html("Error en el servidor.");
+                break;
+            default:
+                console.log(jqXHR);
+                $("#divCheckPasswordMatch").html("Error indeterminado.");
+        }
+    });
+}
+
+/**
+ * Peticion de borrado
+ */
+function borrarUsuario(nombre) {
+    $.post("/borrarUsuario", {
+        nombre: nombre
+    }, function(data, status) {
+        logout();
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        switch (jqXHR.status) {
             case 500:
                 console.log(jqXHR);
                 $("#divCheckPasswordMatch").html("Error en el servidor.");

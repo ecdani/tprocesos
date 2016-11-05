@@ -64,6 +64,19 @@ app.post('/editarUsuario', function (request, response) {
 	}
 });
 
+app.post('/borrarUsuario', function (request, response) {
+	var nombre = request.body.nombre;
+	console.log("CallbackBorrar,Nombre:"+nombre)
+	borrarUsuario(nombre, callback);
+	function callback(err, doc) {
+		if (err) {
+			response.status(500).send('Error en el servidor.');
+		} else {
+			response.status(204).send('Usuario borrado');
+		}
+	}
+});
+
 app.post('/autenticarse', function (request, response) {
 	var nombre = request.body.nombre;
 	var password = request.body.password;
@@ -155,6 +168,19 @@ function editarUsuario(usuario, callback) {
 				callback(err, usuario);
 				db.close();
 			}
+		}
+	}
+}
+
+function borrarUsuario(nombre, callback) {
+
+	MongoClient.connect(url, conexion);
+	function conexion(err, db) {
+		console.log("Borrado del usuario nombre:"+nombre);
+		db.collection('usuarios').deleteOne({ 'nombre': nombre }, deleteOneCallback);
+		function deleteOneCallback(err, r) {
+			console.log(r);
+			callback(err,r);
 		}
 	}
 }
