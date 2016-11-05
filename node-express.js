@@ -37,8 +37,8 @@ app.post('/crearUsuario', function (request, response) {
 	var nombre = request.body.nombre;
 	var password = request.body.password;
 
-	var usuario = new modelo.Usuario(nombre);
-	insertarUsuario(usuario, password);
+	var usuario = new modelo.Usuario(nombre,password);
+	insertarUsuario(usuario);
 
 	this.juego = new modelo.Juego();
 	this.juego.agregarNivel(new modelo.Nivel("1"));
@@ -49,11 +49,11 @@ app.post('/crearUsuario', function (request, response) {
 app.post('/editarUsuario', function (request, response) {
 	var nombre = request.body.nombre;
 	var password = request.body.password;
-	console.log(nombre)
-	console.log(password)
+	console.log("CallbackEditar,Nombre:"+nombre)
+	console.log("CallbackEditar,Pass:"+password)
 
-	//var usuario = new modelo.Usuario(nombre);
-	editarUsuario(nombre, password, callback);
+	var usuario = new modelo.Usuario(nombre,password);
+	editarUsuario(usuario, callback);
 
 	function callback(err, doc) {
 		if (err) {
@@ -104,54 +104,64 @@ console.log("Servidor escuchando en el puerto " + port);
 app.listen(process.env.PORT || 1338);
 
 
-/**
- * Funciones de Mongo DB
- */
+/*******************************
+ * Funciones de Mongo DB       *
+ *******************************/
 
-function insertarUsuario(usuario, password) {
+/**
+ * Insertar usuario
+ */
+function insertarUsuario(usuario) {
 	MongoClient.connect(url, conexion);
 	function conexion(err, db) {
-
-		db.collection('usuarios').insertOne({ usuario: usuario, password: password }, callback);
+		db.collection('usuarios').insertOne( usuario , callback);
 		function callback(err, r) { // Está anidada, para poder acceder a db.
 			db.close();
 		}
 	}
 }
 
+/**
+ * Cargar usuario
+ */
 function cargarUsuario(nombre, callback) {
+	MongoClient.connect(url, conexion);
 	function conexion(err, db) {
+		db.collection('usuarios').findOne({ 'nombre': nombre }, cargarUsuariofindOneCallback);
 		function cargarUsuariofindOneCallback(err, r) {
-
 			callback(err, r);
 			db.close();
-		}
-		db.collection('usuarios').findOne({ 'usuario.nombre': nombre }, cargarUsuariofindOneCallback);
+		}	
 	}
-	MongoClient.connect(url, conexion);
 }
 
-function editarUsuario(nombre,password, callback) {
+/**
+ * Editar usuario
+ */
+function editarUsuario(usuario, callback) {
+
 	MongoClient.connect(url, conexion);
 	function conexion(err, db) {
-		//assert.equal(null, err);
-		console.log("Nombre:"+nombre);
-		db.collection('usuarios').findOne({ 'usuario.nombre': nombre }, findOneCallback);
+		console.log("Edicion del usuaro nombre:"+usuario.nombre);
+		db.collection('usuarios').findOne({ 'nombre': usuario.nombre }, findOneCallback);
 		function findOneCallback(err, r) {
-			console.log(err);
-			r.password = password;
-			r.nombre = nombre;
-			db.collection('usuarios').update({ 'usuario.nombre': nombre },r,updateCallback);
+			console.log(r);
+			r.password = usuario.password; // Solo se edita la password de momento y buscamos por nombre.
+			db.collection('usuarios').update({ 'nombre': usuario.nombre },r,updateCallback);
+			
 			function updateCallback(err,c) {
-				callback(err, r);
+				//error = err;
+				//u = new modelo.Usuario()
+				callback(err, usuario);
 				db.close();
 			}
 		}
 	}
 }
 
-
+// Gallud ***************************************************************************************
 /*Carga niveles desde JSON */
+
 app.get('/pedirNivel/:uid',function(request, response) {
 	var uid = request.params.uid;
 	var usuario = juego.obtnerUsuario(uid);

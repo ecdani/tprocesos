@@ -16,9 +16,17 @@ function checkCookie() {
   var usuario = $.cookie("usuario");
   if (usuario) {
     usuario = $.parseJSON(usuario)
-    autenticarse(usuario.nombre, usuario.password);
+    err = autenticarse(usuario.nombre, usuario.password);
+    if (err) {
+      $('#control').load('../components/inicio/intro.html', function () {
+        $('#enlaceCreacion').on('click', mostrarCreacion);
+        $('#enlaceAutenticacion').on('click', mostrarAutenticacion);
+      });
+      console.log("Cookie incorrecta");
+      $.removeCookie("usuario");
+    }
   } else {
-    $('#control').load('../components/inicio/intro.html',function(){
+    $('#control').load('../components/inicio/intro.html', function () {
       $('#enlaceCreacion').on('click', mostrarCreacion);
       $('#enlaceAutenticacion').on('click', mostrarAutenticacion);
     });

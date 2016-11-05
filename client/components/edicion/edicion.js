@@ -5,6 +5,7 @@
 function edicionExec() {
     var usuario = $.cookie("usuario");
     usuario = $.parseJSON(usuario);
+    console.log(usuario)
     $('#nombre').val(usuario.nombre);
 
     $("#password, #validarpassword").keyup(checkPasswordMatch);
@@ -39,6 +40,8 @@ function editarUsuario(nombre, password) {
                 $("#divCheckPasswordMatch").html("Error en el servidor.");
                 break;
             default:
+                console.log(jqXHR);
+                $("#divCheckPasswordMatch").html("Error indeterminado.");
         }
     });
 }

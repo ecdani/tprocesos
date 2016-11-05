@@ -52,6 +52,7 @@ function autenticarse(nombre, password) {
                 console.log("Error Autenticacion");
                 console.log(jqXHR);
         }
+        return jqXHR;
     });
 }
 
@@ -78,7 +79,9 @@ function callbackAutenticarse(data, status) {
  * Muestra la edición
  */
 function mostrarEdicion(event) {
-    game.destroy();
+    if (!(game.world  === null)) {
+        game.destroy();
+    };
     $.when(
         $('#control').load('../components/edicion/edicion.html'),
         $.getScript("../components/edicion/edicion.js")).then(function() {
@@ -102,7 +105,9 @@ function mostrarJuego(usuario) {
  * Logout
  */
 function logout() {
-    game.destroy();
+    if (!(game.world === null)) {
+        game.destroy();
+    };
     $.removeCookie("usuario");
     $('#control').load('../components/inicio/intro.html', function() {
         $('#enlaceCreacion').on('click', mostrarCreacion);

@@ -82,7 +82,12 @@ bootState.prototype = {
         this.addGameMusic();
 
         setTimeout(function() {
-            game.state.start("juegoState");
+            if (!(game.world === null)) {
+                console.log("ESTO ES LO QUE TIENE GAME:")
+                console.log(game)
+                game.state.start("juegoState");
+                console.log("----NADA MAS----")
+            }
         }, 5000);
     }
 };

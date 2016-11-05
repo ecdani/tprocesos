@@ -14,8 +14,9 @@ function Nivel(num) {
     this.nivel = num;
 }
 
-function Usuario(nombre) {
+function Usuario(nombre,password) {
     this.nombre = nombre;
+    this.password = password; // Debería cifrarse
     this.scoremaximo = 0;
     this.partida = {}
 }
