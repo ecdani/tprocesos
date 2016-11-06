@@ -2,12 +2,14 @@
 /**
  * Ejecutar el juego
  */
+var game = null;
+
 function bootStateExec(usuario) {
     $('#control').empty();
     game = new Phaser.Game(660, 600, Phaser.AUTO, 'control', bootState);
     $('#status').load('../components/juego/status.html', function() {
         $('#nivel').html(usuario.nivel)
-        $('#inombre').html(usuario.nombre)
+        $('#nombre').html(usuario.nombre)
         $('#vidas').html(usuario.vidas)
     });
 }
@@ -22,8 +24,9 @@ bootState.prototype = {
 
     loadBgm: function() {
         // thanks Kevin Macleod at http://incompetech.com/
-        game.load.audio('dangerous', '../components/juego/bgm/Dangerous.mp3');
-        game.load.audio('exit', '../components/juego/bgm/Exit the Premises.mp3');
+        game.load.audio('bootMusic', '../components/juego/bgm/02 The Military System.mp3');
+        game.load.audio('ingameMusic', '../components/juego/bgm/04 Steel Beast.mp3');
+        game.load.audio('endMusic', '../components/juego/bgm/03 Main Theme From Metal Slug.mp3');
     },
     // varios freebies found from google image search
     loadImages: function() {
@@ -49,12 +52,16 @@ bootState.prototype = {
 
         //game.load.script('juegoState', '../components/juego/juegoState.js');
         //game.load.script('endState', '../components/juego/endState.js');
+        game.state.add("bootState", bootState);
         game.state.add("juegoState", juegoState);
         game.state.add("endState", endState);
     },
 
     addGameMusic: function() {
-        music = game.add.audio('dangerous');
+        if (music) {
+            music.destroy();
+        }
+        music = game.add.audio('bootMusic');
         music.loop = true;
         music.play();
     },
@@ -88,6 +95,6 @@ bootState.prototype = {
                 game.state.start("juegoState");
                 console.log("----NADA MAS----")
             }
-        }, 1000);
+        }, 6000);
     }
 };

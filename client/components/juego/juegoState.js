@@ -3,19 +3,19 @@
 //import * as control from "control";
 
 juegoState = function () {
-    player;
-    platforms;
-    cursors;
+    var player;
+    var platforms;
+    var cursors;
     fireButton = null;
     weapon = null;
-    vidas = 5;
-    stars;
-    //score;
+    this.vidas = 5;
+    var stars;
+    this.score = 0;
     var scoreText;
     var timeText;
     block = 0;
     block2 = 0;
-    timer;
+    var timer;
     segundos = 0;
 };
 
@@ -36,7 +36,12 @@ juegoState.prototype = {
 
     create: function () {
 
+        $('#vidas').text(this.vidas);
 
+        music.destroy();
+        music = game.add.audio('ingameMusic');
+        music.loop = true;
+        music.play();
 
         game.physics.startSystem(Phaser.Physics.ARCADE);  //  We're going to be using physics, so enable the Arcade Physics system
         game.add.sprite(0, 0, 'sky'); //  A simple background for our game
@@ -263,10 +268,10 @@ juegoState.prototype = {
         star.kill();
 
         //  Add and update the score
-        score += 10;
+        this.score += 10;
         //scoreText.text = 'Score: ' + this.score;
         //timeText.text = 'Tiempo:' +time;
-        $('#score').text(score);
+        $('#score').text(this.score.toString());
     },
     damageStar: function (player, star) {
 
@@ -274,10 +279,13 @@ juegoState.prototype = {
         star.kill();
 
         //  Add and update the score
-        vidas -= 1;
+        this.vidas -= 1;
         //scoreText.text = 'Score: ' + this.score;
         //timeText.text = 'Tiempo:' +time;
-        $('#vidas').text(vidas);
+        if (this.vidas == 0) {
+            game.state.start("endState");
+        }
+        $('#vidas').text(this.vidas);
     },
     render: function () {
 
