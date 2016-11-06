@@ -3,17 +3,20 @@
 //import * as control from "control";
 
 juegoState = function () {
-    var player;
-    var platforms;
-    var cursors;
-
-    var stars;
-    this.score = 0;
-    var scoreText, timeText;
-    var block = 0;
-    var block2 = 0;
-    var timer;
-    this.segundos = 0;
+    player;
+    platforms;
+    cursors;
+    fireButton = null;
+    weapon = null;
+    vidas = 5;
+    stars;
+    //score;
+    var scoreText;
+    var timeText;
+    block = 0;
+    block2 = 0;
+    timer;
+    segundos = 0;
 };
 
 
@@ -22,16 +25,19 @@ juegoState.prototype = {
         game.load.image('sky', '../components/juego/img/sky.png');
         game.load.image('ground', '../components/juego/img/platform.png');
         game.load.image('star', '../components/juego/img/pangball.png');
+        game.load.image('bullet', '../components/juego/img/shmup-bullet.png');
         game.load.spritesheet('dude', '../components/juego/img/neko.png', 32, 32);
     },
     updateContador: function () {
-        this.segundos++;
-        console.log(this.segundos);
-        $('#time').text(''+this.segundos);
+        segundos++;
+        $('#time').text('' + segundos);
         //timeText.setText('Tiempo: ' + this.segundos);
     },
 
     create: function () {
+
+
+
         game.physics.startSystem(Phaser.Physics.ARCADE);  //  We're going to be using physics, so enable the Arcade Physics system
         game.add.sprite(0, 0, 'sky'); //  A simple background for our game
         platforms = game.add.group(); //  The platforms group contains the ground and the 2 ledges we can jump on
@@ -58,9 +64,11 @@ juegoState.prototype = {
         player = game.add.sprite(32, game.world.height - 150, 'dude'); // The player and its settings
         game.physics.arcade.enable(player); //  We need to enable physics on the player
 
+
+
         //  Player physics properties. Give the little guy a slight bounce.
         player.body.bounce.y = 0.01;
-        player.body.gravity.y = 100;
+        player.body.gravity.y = 500;
         player.body.collideWorldBounds = true;
         //player.body.setCircle(20);
 
@@ -88,11 +96,15 @@ juegoState.prototype = {
             var star = stars.create(i * 70, 0, 'star');
 
             //  Let gravity do its thing
-            star.body.gravity.y = 500;
-            //star.body.gravity.x = Math.floor(Math.random() * 201) - 100;
+            star.body.velocity.y = 500;
+            star.body.acceleration.y = 100;
+            //star.body.gravity.y = 500;
+            star.body.velocity.x = Math.floor(Math.random() * 1001) - 500;
 
             //  This just gives each star a slightly random bounce value
-            star.body.bounce.y = 0.7 + Math.random() * 0.2;
+            star.body.bounce.y = 1;
+            star.body.bounce.x = 1;
+            
 
             star.body.collideWorldBounds = true;
             //star.body.setCircle(16);
@@ -100,12 +112,27 @@ juegoState.prototype = {
 
         }
 
+
+                // Arma
+
+        weapon = game.add.weapon(30, 'bullet'); //  Creates 30 bullets, using the 'bullet' graphic
+
+        weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS; //  The bullet will be automatically killed when it leaves the world bounds
+
+        weapon.bulletSpeed = 800; //  The speed at which the bullet is fired
+
+        weapon.fireRate = 100; //  Speed-up the rate of fire, allowing them to shoot 1 bullet every 60ms
+
+        weapon.trackSprite(player, 16, 16, false); // El arma sigue al personaje
+
         //scoreText = game.add.text(16, 16, 'Vidas: 0', { fontSize: '32px', fill: '#000' }); //  The score
 
-        timer=game.time.events.loop(Phaser.Timer.SECOND,this.updateContador,this);
+        timer = game.time.events.loop(Phaser.Timer.SECOND, this.updateContador, this);
         //timeText =game.add.text(game.world.width-155,60,'Tiempo:0');
 
         cursors = game.input.keyboard.createCursorKeys(); //  Our controls.
+
+        fireButton = game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
 
     },
 
@@ -133,7 +160,7 @@ juegoState.prototype = {
         block = 1;
         block2 = 0;
     },
-    
+
 
     update: function () {
 
@@ -141,10 +168,11 @@ juegoState.prototype = {
         game.physics.arcade.collide(player, platforms);
         game.physics.arcade.collide(stars, platforms);
         game.physics.arcade.collide(stars, stars);
+        //game.physics.arcade.collide(stars, weapon);
         //game.physics.arcade.collide(player, stars);
         //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-        game.physics.arcade.overlap(player, stars, this.collectStar, null, this);
-
+        game.physics.arcade.overlap(player, stars, this.damageStar, null, this);
+        game.physics.arcade.overlap(weapon.bullets, stars, this.collectStar, null, this);
 
 
         //  Reset the players velocity (movement)
@@ -156,9 +184,12 @@ juegoState.prototype = {
                 stars[i].animations.play('die');
             }
         }*/
-
+        if (fireButton.downDuration(20)) {
+            weapon.fire();
+        }
 
         if (cursors.left.isDown) {
+            weapon.fireAngle= Phaser.ANGLE_LEFT;
             block = 0;
             player.body.velocity.x = -150;
             if (!player.body.touching.down && player.body.velocity.y < 0) {
@@ -171,6 +202,7 @@ juegoState.prototype = {
         }
 
         else if (cursors.right.isDown) {
+            weapon.fireAngle= Phaser.ANGLE_RIGHT;
             block = 0;
             player.body.velocity.x = 150;
             if (!player.body.touching.down && player.body.velocity.y < 0) {
@@ -182,12 +214,14 @@ juegoState.prototype = {
             }
         }
         else if (cursors.up.isDown) {
+            weapon.fireAngle= Phaser.ANGLE_UP;
             block = 0;
             player.animations.play('jump');
         }
 
         else if (!player.body.touching.down) {
             //player.frame = 10;
+            weapon.fireAngle= Phaser.ANGLE_DOWN;
             if (player.body.velocity.y > 0 && player.body.velocity.x > 0) {
                 player.animations.play('rightfall');
             } else if (player.body.velocity.y > 0 && player.body.velocity.x < 0) {
@@ -198,6 +232,7 @@ juegoState.prototype = {
         } else {
             //  Stand still
             if (cursors.down.isDown) {
+                
                 player.animations.play('sleep');
                 block = 1;
             } else if (block == 0) {
@@ -212,23 +247,41 @@ juegoState.prototype = {
 
             }
         }
+       
 
         //  Allow the player to jump if they are touching the ground.
         if (cursors.up.isDown && player.body.touching.down) {
             player.body.velocity.y = -350;
 
         }
+        //game.world.wrap(player, 16);
     },
 
-    collectStar: function (player, star) {
+    collectStar: function (weapon, star) {
 
         // Removes the star from the screen
         star.kill();
 
         //  Add and update the score
-        this.score += 10;
+        score += 10;
         //scoreText.text = 'Score: ' + this.score;
         //timeText.text = 'Tiempo:' +time;
-        $('#score').text(this.score);
+        $('#score').text(score);
+    },
+    damageStar: function (player, star) {
+
+        // Removes the star from the screen
+        star.kill();
+
+        //  Add and update the score
+        vidas -= 1;
+        //scoreText.text = 'Score: ' + this.score;
+        //timeText.text = 'Tiempo:' +time;
+        $('#vidas').text(vidas);
+    },
+    render: function () {
+
+        weapon.debug();
+
     }
 }

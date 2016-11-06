@@ -88,6 +88,6 @@ bootState.prototype = {
                 game.state.start("juegoState");
                 console.log("----NADA MAS----")
             }
-        }, 5000);
+        }, 1000);
     }
 };
