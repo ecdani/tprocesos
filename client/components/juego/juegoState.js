@@ -291,6 +291,7 @@ juegoState.prototype = {
         //scoreText.text = 'Score: ' + this.score;
         //timeText.text = 'Tiempo:' +time;
         if (this.vidas == 0) {
+            victoria = false;
             game.state.start("endState");
             console.log('DERROTA');
         }
