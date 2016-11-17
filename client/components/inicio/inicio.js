@@ -1,55 +1,74 @@
 
-//$.ajaxSetup({ cache: false, async: true });
-
-
 
 $('.enlaceLogout').on('click', logout);
+$('.enlaceEdicion').on('click', mostrarEdicion);
 $('.enlaceCreacion').on('click', mostrarCreacion);
 $('.enlaceAutenticacion').on('click', mostrarAutenticacion);
-$('.enlaceEdicion').on('click', mostrarEdicion);
 
 checkCookie();
-
 
 //.toggleClass( "active" )
 function checkCookie() {
   var usuario = $.cookie("usuario");
   if (usuario) {
-    usuario = $.parseJSON(usuario)
-    err = autenticarse(usuario.nombre, usuario.password);
+    Singleton.instance = $.parseJSON(usuario);
+    err = usuario.autenticarse();
+    //err = autenticarse(usuario.nombre, usuario.password);
     if (err) {
-      $('#control').load('../components/inicio/intro.html', function () {
-        $('#enlaceCreacion').on('click', mostrarCreacion);
-        $('#enlaceAutenticacion').on('click', mostrarAutenticacion);
-      });
+      mostrarInfo();
       console.log("Cookie incorrecta");
       $.removeCookie("usuario");
     }
   } else {
-    $('#control').load('../components/inicio/intro.html', function () {
-      $('#enlaceCreacion').on('click', mostrarCreacion);
-      $('#enlaceAutenticacion').on('click', mostrarAutenticacion);
-    });
+    mostrarIntro();
     console.log("No cookie");
   }
 }
 
+function mostrarIntro() {
+  $('#control').load('../components/inicio/intro.html', function () {
+    $('#enlaceCreacion').on('click', mostrarCreacion);
+    $('#enlaceAutenticacion').on('click', mostrarAutenticacion);
+  });
+}
 
 function mostrarAutenticacion() {
   $.when(
-    $('#control').load('../components/login/login.html'),
-    $.getScript("../components/login/login.js")
+    $('#control').load('../components/usuario/login.html'),
+    $.getScript("../components/usuario/login.js")
   ).then(function () {
     loginExec();
   });
 }
 
 function mostrarCreacion() {
+  //eval("riasa()");
   $.when(
-    $('#control').load('../components/creacion/creacion.html'),
-    $.getScript("../components/creacion/creacion.js")
+    $('#control').load('../components/usuario/creacion.html'),
+    $.getScript("../components/usuario/creacion.js")
   ).then(function () {
     creacionExec();
   });
 }
 
+function mostrarEdicion(event) {
+  if (!(game.world === null)) {
+    game.destroy();
+  };
+  $.when(
+    $('#control').load('../components/usuario/edicion.html'),
+    $.getScript("../components/usuario/edicion.js")
+  ).then(function () {
+    edicionExec();
+  });
+}
+
+function mostrarJuego() {
+  $.when(
+    $.getScript("../components/juego/juegoState.js"),
+    $.getScript("../components/juego/endState.js"),
+    $.getScript("../components/juego/bootState.js")
+  ).then(function () {
+    bootStateExec();
+  });
+}

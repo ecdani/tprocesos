@@ -5,23 +5,25 @@ function creacionExec() {
 
     $('#nombreBtn').on('click', function(event) {
         event.preventDefault();
-        nombre = $('#nombre').val();
-        password = $('#password').val();
-        //console.dir(nombre);
-        crearUsuario(nombre, password);
-        $('#control').empty();
 
+        var usuario = Singleton.getInstance();
+        usuario.nombre = $('#nombre').val();
+        usuario.password = $('#password').val();
+        usuario.crear(doneAutenticarse,failCrearUsuario);
+
+        $('#control').empty();
     });
 }
 
-
-function crearUsuario(nombre, password) {
+/*
+function crearUsuario(nombre, password, email) {
     if (nombre == "") {
         nombre = "jugador";
     }
     $.post("/crearUsuario", {
         nombre: nombre,
-        password: password
+        password: password,
+        email: email,
     },
         function(data, status) {
             callbackAutenticarse(data, status);
@@ -38,4 +40,4 @@ function crearUsuario(nombre, password) {
                 default:
             }
         });
-}
+}*/

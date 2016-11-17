@@ -4,7 +4,8 @@
  */
 var game = null;
 
-function bootStateExec(usuario) {
+function bootStateExec() {
+    var usuario = Singleton.getInstance();
     $('#control').empty();
     game = new Phaser.Game(660, 600, Phaser.AUTO, 'control', bootState);
     $('#status').load('../components/juego/status.html', function() {

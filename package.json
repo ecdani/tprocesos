@@ -10,6 +10,7 @@
     "mongodb": "^2.2.11",
     "mongodb-core": "~1.0",
     "ntwitter": "^0.5.0",
+    "request": "^2.78.0",
     "underscore": "^1.7.0"
   },
   "devDependencies": {},

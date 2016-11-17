@@ -1,6 +1,6 @@
 
 /**
- * Ejecucion de la pantalla de edicion
+ * Función para ejecutar al cargar la pantalla de edición
  */
 function edicionExec() {
     var usuario = $.cookie("usuario");
@@ -12,21 +12,25 @@ function edicionExec() {
 
     $('#nombreBtn').on('click', function(event) {
         event.preventDefault();
-        nombre = $('#nombre').val();
-        password = $('#password').val();
-        editarUsuario(nombre, password);
+
+        var usuario = Singleton.getInstance();
+        usuario.nombre = $('#nombre').val();
+        usuario.password = $('#password').val();
+        usuario.editarUsuario(doneEditar, failEditar);
+
     });
 
     $('#borrarBtn').on('click', function(event) {
         event.preventDefault();
-        nombre = $('#nombre').val();;
-        borrarUsuario(nombre);
+        var usuario = Singleton.getInstance();
+        usuario.borrar(doneBorrar, logout);
     });
 }
 
 /**
  * Peticion de edicion
  */
+/*
 function editarUsuario(nombre, password) {
     $.post("/editarUsuario", {
         nombre: nombre,
@@ -52,25 +56,5 @@ function editarUsuario(nombre, password) {
                 $("#divCheckPasswordMatch").html("Error indeterminado.");
         }
     });
-}
+}*/
 
-/**
- * Peticion de borrado
- */
-function borrarUsuario(nombre) {
-    $.post("/borrarUsuario", {
-        nombre: nombre
-    }, function(data, status) {
-        logout();
-    }).fail(function(jqXHR, textStatus, errorThrown) {
-        switch (jqXHR.status) {
-            case 500:
-                console.log(jqXHR);
-                $("#divCheckPasswordMatch").html("Error en el servidor.");
-                break;
-            default:
-                console.log(jqXHR);
-                $("#divCheckPasswordMatch").html("Error indeterminado.");
-        }
-    });
-}

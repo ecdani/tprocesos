@@ -47,14 +47,9 @@ app.post('/crearUsuario', function (request, response) {
 });
 
 app.post('/editarUsuario', function (request, response) {
-	var nombre = request.body.nombre;
-	var password = request.body.password;
-	console.log("CallbackEditar,Nombre:" + nombre)
-	console.log("CallbackEditar,Pass:" + password)
 
-	var usuario = new modelo.Usuario(nombre, password);
+	var usuario = new modelo.Usuario(request.body.nombre, request.body.password);
 	editarUsuario(usuario, callback);
-
 	function callback(err, doc) {
 		if (err) {
 			response.status(500).send('Error en el servidor.');
@@ -65,9 +60,8 @@ app.post('/editarUsuario', function (request, response) {
 });
 
 app.post('/borrarUsuario', function (request, response) {
-	var nombre = request.body.nombre;
-	console.log("CallbackBorrar,Nombre:" + nombre)
-	borrarUsuario(nombre, callback);
+
+	borrarUsuario(request.body.nombre, callback);
 	function callback(err, doc) {
 		if (err) {
 			response.status(500).send('Error en el servidor.');
@@ -108,6 +102,10 @@ app.get('/estadistica', function (request, response) {
 	response.send(contenido);
 });
 
+app.get('/nivelCompletado'), function(request,response) {
+	var tiempo = request.params.tiempo
+	//update mongo
+}
 
 /**
  * Lanzar servidor
@@ -170,6 +168,10 @@ function borrarUsuario(nombre, callback) {
 }
 
 // Gallud ***************************************************************************************
+/** Persistencia estadisticas */
+
+
+
 /*Carga niveles desde JSON */
 
 app.get('/pedirNivel/:uid', function (request, response) {
