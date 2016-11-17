@@ -2,6 +2,8 @@
 //var game = new Phaser.Game(800,600, Phaser.AUTO, 'juegoId', { preload: preload, create: create, update: update });
 //import * as control from "control";
 
+victoria = false;
+
 juegoState = function () {
     var player;
     var platforms;
@@ -17,13 +19,15 @@ juegoState = function () {
     block2 = 0;
     var timer;
     segundos = 0;
+    this.blaster = null;
 };
 
 
 juegoState.prototype = {
     preload: function () {
         game.load.image('sky', '../components/juego/img/sky.png');
-        game.load.image('ground', '../components/juego/img/platform.png');
+        game.load.image('platform', '../components/juego/img/platform4.png');
+        game.load.image('ground', '../components/juego/img/platform3.png');
         game.load.image('star', '../components/juego/img/pangball.png');
         game.load.image('bullet', '../components/juego/img/shmup-bullet.png');
         game.load.spritesheet('dude', '../components/juego/img/neko.png', 32, 32);
@@ -43,12 +47,15 @@ juegoState.prototype = {
         music.loop = true;
         music.play();
 
+        blaster = game.add.audio('blaster');
+
         game.physics.startSystem(Phaser.Physics.ARCADE);  //  We're going to be using physics, so enable the Arcade Physics system
-        game.add.sprite(0, 0, 'sky'); //  A simple background for our game
+        game.add.sprite(0, 0, 'backgroundMS'); //  A simple background for our game
         platforms = game.add.group(); //  The platforms group contains the ground and the 2 ledges we can jump on
         platforms.enableBody = true; //  We will enable physics for any object that is created in this group
 
         var ground = platforms.create(0, game.world.height - 64, 'ground'); // Here we create the ground.
+        //ground.setRectangle(400,32);
         ground.scale.setTo(2, 2); //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
         ground.body.immovable = true; //  This stops it from falling away when you jump on it
 
@@ -60,7 +67,7 @@ juegoState.prototype = {
         // ledge.body.immovable = true;
 
         for (var i = 0; i < Math.random() * 10; i++) {
-            ledge = platforms.create(Math.random() * 1000, Math.random() * 1000, 'ground');
+            ledge = platforms.create(Math.random() * 1000, Math.random() * 1000, 'platform');
             ledge.body.immovable = true;
         }
 
@@ -117,17 +124,11 @@ juegoState.prototype = {
 
         }
 
-
-                // Arma
-
+        // Arma
         weapon = game.add.weapon(30, 'bullet'); //  Creates 30 bullets, using the 'bullet' graphic
-
         weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS; //  The bullet will be automatically killed when it leaves the world bounds
-
         weapon.bulletSpeed = 800; //  The speed at which the bullet is fired
-
         weapon.fireRate = 100; //  Speed-up the rate of fire, allowing them to shoot 1 bullet every 60ms
-
         weapon.trackSprite(player, 16, 16, false); // El arma sigue al personaje
 
         //scoreText = game.add.text(16, 16, 'Vidas: 0', { fontSize: '32px', fill: '#000' }); //  The score
@@ -191,6 +192,7 @@ juegoState.prototype = {
         }*/
         if (fireButton.downDuration(20)) {
             weapon.fire();
+            blaster.play();
         }
 
         if (cursors.left.isDown) {
@@ -249,17 +251,20 @@ juegoState.prototype = {
                     block2 = 1;
                     game.time.events.add(2000, this.sleep, this);
                 }
-
             }
         }
        
-
         //  Allow the player to jump if they are touching the ground.
         if (cursors.up.isDown && player.body.touching.down) {
             player.body.velocity.y = -350;
-
         }
-        //game.world.wrap(player, 16);
+
+        if (stars.checkAll('alive', false)) {
+            victoria = true;
+            console.log('VICTORIA');
+            game.state.start("endState");
+        }
+
     },
 
     collectStar: function (weapon, star) {
@@ -273,17 +278,22 @@ juegoState.prototype = {
         //timeText.text = 'Tiempo:' +time;
         $('#score').text(this.score.toString());
     },
+
     damageStar: function (player, star) {
 
         // Removes the star from the screen
         star.kill();
+
+
 
         //  Add and update the score
         this.vidas -= 1;
         //scoreText.text = 'Score: ' + this.score;
         //timeText.text = 'Tiempo:' +time;
         if (this.vidas == 0) {
+            victoria = false;
             game.state.start("endState");
+            console.log('DERROTA');
         }
         $('#vidas').text(this.vidas);
     },
