@@ -4,6 +4,47 @@
  * la gestión de usuarios.
  */
 
+var Singleton = (function () {
+    var instance;
+
+    function createInstance() {
+        var object = new Usuario();
+        return object;
+    }
+
+    return {
+        getInstance: function () {
+            if (!instance) {
+                instance = createInstance();
+            }
+            return instance;
+        }
+    };
+})();
+
+Singleton.getInstance().loadCookie();
+
+
+//.toggleClass( "active" )
+/*function checkCookie() {
+  var usuario = Singleton.getInstance();
+  err = usuario.loadCookie();
+  if (usuario) {
+    
+    //Singleton.instance = $.parseJSON(usuario);
+    
+    //err = autenticarse(usuario.nombre, usuario.password);
+    if (err) {
+      mostrarInfo();
+      console.log("Cookie incorrecta");
+      $.removeCookie("usuario");
+    }
+  } else {
+    mostrarIntro();
+    console.log("No cookie");
+  }
+}*/
+
 /**
  * Comprobacion de contraseñas.
  */
@@ -55,6 +96,26 @@ function Usuario() {
         $.post("/borrarUsuario", {
             nombre: this.nombre
         }).done(done).fail(fail);
+    };
+
+    this.loadCookie = function() {
+        var cookie = $.cookie("usuario");
+        if (cookie) {
+            pseudoUsuario = $.parseJSON(cookie);
+            this.nombre = pseudoUsuario.nombre;
+            this.password = pseudoUsuario.password;
+            this.scoremaximo = pseudoUsuario.scoremaximo;
+            this.partida = pseudoUsuario.partida;
+            err = this.autenticarse(doneAutenticarse, failAutenticarse);
+            if (err) {
+                mostrarInfo();
+                console.log("Cookie incorrecta");
+                $.removeCookie("usuario");
+            }
+        } else {
+            mostrarIntro();
+            console.log("No cookie");
+        }
     }
 }
 /*Usuario.prototype.borrar = function () { borrarUsuario(this); };
@@ -65,49 +126,29 @@ function borrarUsuario(this, done, fail) {
 }*/
 
 function failBorrar(jqXHR, textStatus, errorThrown) {
+    console.log(jqXHR);
     switch (jqXHR.status) {
         case 500:
-            console.log(jqXHR);
             $("#divCheckPasswordMatch").html("Error en el servidor.");
             break;
         default:
-            console.log(jqXHR);
             $("#divCheckPasswordMatch").html("Error indeterminado.");
     }
 }
 
 
-var Singleton = (function () {
-    var instance;
-
-    function createInstance() {
-        var object = new Usuario();
-        return object;
-    }
-
-    return {
-        getInstance: function () {
-            if (!instance) {
-                instance = createInstance();
-            }
-            return instance;
-        }
-    };
-})();
 
 
 function failEditar(jqXHR, textStatus, errorThrown) {
+    console.log(jqXHR);
     switch (jqXHR.status) {
         case 409:
-            console.log(jqXHR);
             $("#divCheckPasswordMatch").html("El nombre de usuario ya existe.");
             break;
         case 500:
-            console.log(jqXHR);
             $("#divCheckPasswordMatch").html("Error en el servidor.");
             break;
         default:
-            console.log(jqXHR);
             $("#divCheckPasswordMatch").html("Error indeterminado.");
     }
 }

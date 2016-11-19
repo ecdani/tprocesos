@@ -16,7 +16,7 @@ function edicionExec() {
         var usuario = Singleton.getInstance();
         usuario.nombre = $('#nombre').val();
         usuario.password = $('#password').val();
-        usuario.editarUsuario(doneEditar, failEditar);
+        usuario.editar(doneEditar, failEditar);
 
     });
 

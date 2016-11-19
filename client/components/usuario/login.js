@@ -8,7 +8,6 @@ function loginExec() {
         var usuario = Singleton.getInstance();
         usuario.nombre = $('#nombre').val();
         usuario.password = $('#password').val();
-        console.log(usuario);
         usuario.autenticarse(doneAutenticarse,failAutenticarse);
     });
 }
