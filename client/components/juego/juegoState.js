@@ -4,10 +4,10 @@ var victoria = false;
 var nivel = 0;
 
 juegoState = function () {
-    
+
     var player;
     var platforms;
-    var cursors;
+    //var cursors;
     fireButton = null;
     weapon = null;
     this.vidas = 5;
@@ -34,9 +34,9 @@ juegoState.prototype = {
         game.load.image('sky', '../components/juego/img/sky.png');
         game.load.image('platform', '../components/juego/img/platform4.png');
         game.load.image('ground', '../components/juego/img/platform3.png');
-        
-        game.load.image('star', '../components/juego/img/pangball'+nivel+'.png');
-        game.load.image('backgroundMS', '../components/juego/img/backgroundMS'+nivel+'.gif');
+
+        game.load.image('star', '../components/juego/img/pangball' + nivel + '.png');
+        game.load.image('backgroundMS', '../components/juego/img/backgroundMS' + nivel + '.gif');
 
         game.load.image('bullet', '../components/juego/img/shmup-bullet.png');
         game.load.spritesheet('dude', '../components/juego/img/neko.png', 32, 32);
@@ -74,9 +74,9 @@ juegoState.prototype = {
 
         //ledge = platforms.create(-150, 250, 'ground');
         // ledge.body.immovable = true;
-       
+
         for (var i = 0; i < niveles[nivel].platforms.length; i++) {
-            ledge = platforms.create( niveles[nivel].platforms[i].x, niveles[nivel].platforms[i].y, 'platform');
+            ledge = platforms.create(niveles[nivel].platforms[i].x, niveles[nivel].platforms[i].y, 'platform');
             ledge.body.immovable = true;
         }
         /*for (var i = 0; i < Math.random() * 10; i++) {
@@ -129,7 +129,7 @@ juegoState.prototype = {
             //  This just gives each star a slightly random bounce value
             star.body.bounce.y = 1;
             star.body.bounce.x = 1;
-            
+
 
             star.body.collideWorldBounds = true;
             //star.body.setCircle(16);
@@ -149,14 +149,20 @@ juegoState.prototype = {
         timer = game.time.events.loop(Phaser.Timer.SECOND, this.updateContador, this);
         //timeText =game.add.text(game.world.width-155,60,'Tiempo:0');
 
-        cursors = game.input.keyboard.createCursorKeys(); //  Our controls.
+        //cursors = game.input.keyboard.createCursorKeys(); //  Our controls.
 
-        fireButton = game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
+        //http://phaser.io/docs/2.4.4/Phaser.KeyCode.html
+        fireButton = game.input.keyboard.addKey(Phaser.KeyCode.LEFT);
+        w = game.input.keyboard.addKey(Phaser.KeyCode.W);
+        a = game.input.keyboard.addKey(Phaser.KeyCode.A);
+        s = game.input.keyboard.addKey(Phaser.KeyCode.S);
+        d = game.input.keyboard.addKey(Phaser.KeyCode.D);
+        spacebar = game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
 
     },
 
     /* Generacion de niveles a partir de JSON - Gallud */
-  
+
 
     crearNivel: function (data) {
         if (data.nivel < 0) {
@@ -179,11 +185,11 @@ juegoState.prototype = {
         game.physics.arcade.collide(player, platforms);
         game.physics.arcade.collide(stars, platforms);
         game.physics.arcade.collide(stars, stars);
-        //game.physics.arcade.collide(stars, weapon);
         //game.physics.arcade.collide(player, stars);
         //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
         game.physics.arcade.overlap(player, stars, this.damageStar, null, this);
         game.physics.arcade.overlap(weapon.bullets, stars, this.collectStar, null, this);
+        game.physics.arcade.overlap(weapon.bullets, platforms, this.clearBullet, null, this);
 
 
         //  Reset the players velocity (movement)
@@ -200,9 +206,13 @@ juegoState.prototype = {
             blaster.play();
         }
 
-        if (cursors.left.isDown) {
-            weapon.fireAngle= Phaser.ANGLE_LEFT;
-            block = 0;
+
+        if (a.isDown) {
+            if (w.isDown) {
+                weapon.fireAngle = Phaser.ANGLE_UP;
+            } else {
+                weapon.fireAngle = Phaser.ANGLE_LEFT;
+            }
             player.body.velocity.x = -150;
             if (!player.body.touching.down && player.body.velocity.y < 0) {
                 player.animations.play('leftjump');
@@ -213,9 +223,12 @@ juegoState.prototype = {
             }
         }
 
-        else if (cursors.right.isDown) {
-            weapon.fireAngle= Phaser.ANGLE_RIGHT;
-            block = 0;
+        else if (d.isDown) {
+            if (w.isDown) {
+                weapon.fireAngle = Phaser.ANGLE_UP;
+            } else {
+                weapon.fireAngle = Phaser.ANGLE_RIGHT;
+            }
             player.body.velocity.x = 150;
             if (!player.body.touching.down && player.body.velocity.y < 0) {
                 player.animations.play('rightjump');
@@ -225,15 +238,21 @@ juegoState.prototype = {
                 player.animations.play('right');
             }
         }
-        else if (cursors.up.isDown) {
-            weapon.fireAngle= Phaser.ANGLE_UP;
-            block = 0;
-            player.animations.play('jump');
+        else if (w.isDown) {
+            weapon.fireAngle = Phaser.ANGLE_UP;
+            player.body.velocity.x = 0;
+            player.animations.stop();
+            player.frame = 0;
+        } else {
+            player.body.velocity.x = 0;
+            player.animations.stop();
+            player.frame = 0;
+
         }
 
-        else if (!player.body.touching.down) {
+        if (!player.body.touching.down) {
             //player.frame = 10;
-            weapon.fireAngle= Phaser.ANGLE_DOWN;
+            //
             if (player.body.velocity.y > 0 && player.body.velocity.x > 0) {
                 player.animations.play('rightfall');
             } else if (player.body.velocity.y > 0 && player.body.velocity.x < 0) {
@@ -241,27 +260,26 @@ juegoState.prototype = {
             } else {
                 player.animations.play('fall');
             }
+            if (s.isDown) {
+                weapon.fireAngle = Phaser.ANGLE_DOWN;
+                //player.body.velocity.x = 0;
+                //player.animations.play('sleep');
+            }
         } else {
             //  Stand still
-            if (cursors.down.isDown) {
-                
-                player.animations.play('sleep');
-                block = 1;
-            } else if (block == 0) {
-                player.animations.stop();
-
-                player.frame = 0;
-                player.body.velocity.x = 0;
-                if (block2 == 0) {
-                    block2 = 1;
-                    game.time.events.add(2000, this.sleep, this);
+            if (s.isDown) {
+                if (player.body.velocity.x < 0){
+                    player.body.velocity.x = -50;
+                } else if (player.body.velocity.x > 0){
+                    player.body.velocity.x = 50;
                 }
             }
         }
-       
+
         //  Allow the player to jump if they are touching the ground.
-        if (cursors.up.isDown && player.body.touching.down) {
+        if (spacebar.isDown && player.body.touching.down) {
             player.body.velocity.y = -350;
+            player.animations.play('jump');
         }
 
         if (stars.checkAll('alive', false)) {
@@ -271,18 +289,23 @@ juegoState.prototype = {
                 console.log('VICTORIA');
                 game.state.start("endState");
             } else {
-                nivel ++;
+                nivel++;
                 game.state.start("juegoState");
             }
-            
+
         }
 
+    },
+
+    clearBullet: function (weapon, platform) {
+        weapon.kill();
     },
 
     collectStar: function (weapon, star) {
 
         // Removes the star from the screen
         star.kill();
+        weapon.kill();
 
         //  Add and update the score
         this.score += 10;
