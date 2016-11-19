@@ -4,6 +4,9 @@
  * la gestión de usuarios.
  */
 
+/**
+ * Singleton de usuario. Se debe usar para asegurar la unicidad del usuario.
+ */
 var Singleton = (function () {
     var instance;
 
@@ -25,26 +28,6 @@ var Singleton = (function () {
 Singleton.getInstance().loadCookie();
 
 
-//.toggleClass( "active" )
-/*function checkCookie() {
-  var usuario = Singleton.getInstance();
-  err = usuario.loadCookie();
-  if (usuario) {
-    
-    //Singleton.instance = $.parseJSON(usuario);
-    
-    //err = autenticarse(usuario.nombre, usuario.password);
-    if (err) {
-      mostrarInfo();
-      console.log("Cookie incorrecta");
-      $.removeCookie("usuario");
-    }
-  } else {
-    mostrarIntro();
-    console.log("No cookie");
-  }
-}*/
-
 /**
  * Comprobacion de contraseñas.
  */
@@ -61,13 +44,20 @@ function checkPasswordMatch() {
     }
 }
 
-
+/**
+ * Objeto proxy que representa un usuario en el cliente.
+ */
 function Usuario() {
     this.nombre = '';
     this.password = ''; // Debería cifrarse
     this.scoremaximo = 0;
     this.partida = {};
 
+    /**
+     * Comprueba si este usuario existe en mongo.
+     * @param done Función de callback en caso de éxito de la operación
+     * @param fail Función de callback en caso de fracaso de la operación
+     */
     this.autenticarse = function (done, fail) {
         $.post("/autenticarse", {
             nombre: this.nombre,
@@ -75,6 +65,11 @@ function Usuario() {
         }).done(done).fail(fail);
     };
 
+    /**
+     * Se crea el usuario en mongo con los datos propios actuales
+     * @param done Función de callback en caso de éxito de la operación
+     * @param fail Función de callback en caso de fracaso de la operación
+     */
     this.crear = function (done, fail) {
         if (this.nombre == "") {
             this.nombre = "jugador";
@@ -85,6 +80,11 @@ function Usuario() {
         }).done(done).fail(fail);
     };
 
+    /**
+     * Actualiza el usuario de mongo con los datos propios actuales
+     * @param done Función de callback en caso de éxito de la operación
+     * @param fail Función de callback en caso de fracaso de la operación
+     */
     this.editar = function (done, fail) {
         $.post("/editarUsuario", {
             nombre: this.nombre,
@@ -92,12 +92,20 @@ function Usuario() {
         }).done(done).fail(fail);
     };
 
+    /**
+     * Se elimina el usuario de mongo.
+     * @param done Función de callback en caso de éxito de la operación
+     * @param fail Función de callback en caso de fracaso de la operación
+     */
     this.borrar = function (done, fail) {
         $.post("/borrarUsuario", {
             nombre: this.nombre
         }).done(done).fail(fail);
     };
 
+    /**
+     * Carga de la cookie de usuario el usuario.
+     */
     this.loadCookie = function() {
         var cookie = $.cookie("usuario");
         if (cookie) {
@@ -118,13 +126,73 @@ function Usuario() {
         }
     }
 }
-/*Usuario.prototype.borrar = function () { borrarUsuario(this); };
-function borrarUsuario(this, done, fail) {
-    $.post("/borrarUsuario", {
-        nombre: this.nombre
-    }).done(done).fail(fail);
-}*/
 
+/**
+ * Funcionalidad posterior a la edición de un usuario.
+ */
+function doneEditar(data, status) {
+    console.log('El usuario que llega de la edicion:')
+    console.log(data);
+    $.cookie("usuario", JSON.stringify(data));
+    $("#divCheckPasswordMatch").html("Usuario actualizado.");
+}
+
+
+/**
+ * Funcionalidad posterior a autenticarse. y a la creación
+ */
+function doneAutenticarse(juego, status) {
+
+    $('.enlaceCreacion').hide(); //.toggleClass( "active" )
+    $('.enlaceAutenticacion').hide();
+    $('.enlaceLogout').show();
+    $('.enlaceEdicion').show();
+
+    $.cookie("usuario", JSON.stringify(Singleton.getInstance()));
+
+    mostrarJuego();
+}
+
+/**
+ * Funcionalidad en caso de fallo de la autenticacion.
+ */
+function failAutenticarse(jqXHR, textStatus, errorThrown) {
+    console.log(jqXHR);
+    switch (jqXHR.status) {
+        case 404:
+            $("#autenticacionInfo").html("Usuario no encontrado.");
+            break;
+        case 500:
+            $("#autenticacionInfo").html("Error en el servidor.");
+            break;
+        case 401:
+            $("#autenticacionInfo").html("Contraseña incorrecta.");
+            break;
+        default:
+            console.log("Error Autenticacion");
+    }
+    return jqXHR;
+}
+
+/**
+ * Funcionalidad en caso de fallo de la creación/registro.
+ */
+function failCrearUsuario(jqXHR, textStatus, errorThrown) {
+    console.log(jqXHR);
+    switch (jqXHR.status) {
+        case 409:
+            $("#divCheckPasswordMatch").html("El nombre de usuario ya existe.");
+            break;
+        case 500:
+            $("#divCheckPasswordMatch").html("Error en el servidor.");
+            break;
+        default:
+    }
+}
+
+/**
+ * Funcionalidad en caso de fallo del borrado
+ */
 function failBorrar(jqXHR, textStatus, errorThrown) {
     console.log(jqXHR);
     switch (jqXHR.status) {
@@ -136,9 +204,9 @@ function failBorrar(jqXHR, textStatus, errorThrown) {
     }
 }
 
-
-
-
+/**
+ * Funcionalidad en caso de fallo de la edición
+ */
 function failEditar(jqXHR, textStatus, errorThrown) {
     console.log(jqXHR);
     switch (jqXHR.status) {
@@ -152,86 +220,3 @@ function failEditar(jqXHR, textStatus, errorThrown) {
             $("#divCheckPasswordMatch").html("Error indeterminado.");
     }
 }
-
-function doneEditar(data, status) {
-    console.log('El usuario que llega de la edicion:')
-    console.log(data);
-    $.cookie("usuario", JSON.stringify(data));
-    $("#divCheckPasswordMatch").html("Usuario actualizado.");
-}
-
-
-/**
- * Funcionalidad en caso de fallo de la autenticacion.
- */
-function failAutenticarse(jqXHR, textStatus, errorThrown) {
-    switch (jqXHR.status) {
-        case 404:
-            console.log(jqXHR);
-            $("#autenticacionInfo").html("Usuario no encontrado.");
-            break;
-        case 500:
-            console.log(jqXHR);
-            $("#autenticacionInfo").html("Error en el servidor.");
-            break;
-        case 401:
-            console.log(jqXHR);
-            $("#autenticacionInfo").html("Contraseña incorrecta.");
-            break;
-        default:
-            console.log("Error Autenticacion");
-            console.log(jqXHR);
-    }
-    return jqXHR;
-}
-
-/**
- * Funcionalidad posterior a autenticarse. y a la creación
- */
-function doneAutenticarse(juego, status) {
-    /*console.log("Exito Autenticacion");
-    console.log("Entrando en callback Autenticarse");
-    console.log(status);*/
-
-    //var usuario = juego.usuarios[0];
-
-    $('.enlaceCreacion').hide();
-    $('.enlaceAutenticacion').hide();
-    $('.enlaceLogout').show();
-    $('.enlaceEdicion').show();
-
-    $.cookie("usuario", JSON.stringify(Singleton.getInstance()));
-
-    mostrarJuego();
-}
-
-function failCrearUsuario(jqXHR, textStatus, errorThrown) {
-    switch (jqXHR.status) {
-        case 409:
-            console.log(jqXHR);
-            $("#divCheckPasswordMatch").html("El nombre de usuario ya existe.");
-            break;
-        case 500:
-            console.log(jqXHR);
-            $("#divCheckPasswordMatch").html("Error en el servidor.");
-            break;
-        default:
-    }
-}
-
-/**
- * Logout
- */
-function logout() {
-    if (!(game.world === null)) {
-        game.destroy();
-    };
-    $.removeCookie("usuario");
-    mostrarIntro();
-    $('#status').empty();
-    $('.enlaceLogout').hide();
-    $('.enlaceEdicion').hide();
-    $('.enlaceCreacion').show();
-    $('.enlaceAutenticacion').show();
-}
-

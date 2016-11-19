@@ -1,6 +1,6 @@
 
 /**
- * Ejecución de la pantalla de login
+ * Función a ejecutar al cargar la pantalla de login
  */
 function loginExec() {
     $('#nombreBtn').on('click', function (event) {

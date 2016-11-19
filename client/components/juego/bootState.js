@@ -1,9 +1,10 @@
 
-/**
- * Ejecutar el juego
- */
+
 var game = null;
 
+/**
+ * Ejecuta el juego, esta función se ejecuta posterior a la carga de este .js
+ */
 function bootStateExec() {
     var usuario = Singleton.getInstance();
     $('#control').empty();
@@ -16,22 +17,37 @@ function bootStateExec() {
 }
 
 
-bootState = function() { },
-    playSound = true,
-    playMusic = true,
-    music = null;
+var playSound = true;
+var playMusic = true;
+var music = null;
+var niveles = null;
+
+/**
+ * Estado inicial del juego
+ */
+bootState = function() { };
 
 bootState.prototype = {
 
-    loadBgm: function() {
-        // thanks Kevin Macleod at http://incompetech.com/
-        game.load.audio('bootMusic', '../components/juego/bgm/02 The Military System.mp3');
-        game.load.audio('ingameMusic', '../components/juego/bgm/04 Steel Beast.mp3');
-        game.load.audio('endMusic', '../components/juego/bgm/03 Main Theme From Metal Slug.mp3');
-        game.load.audio('blaster', '../components/juego/bgm/blaster.mp3');
+    /**
+     * Init is the very first function called when your State starts up. It's called before preload,
+     * create or anything else. If you need to route the game away to another State you could do so here,
+     * or if you need to prepare a set of variables or objects before the preloading starts.
+     */
+    init: function() {
+        this.status = game.make.text(game.world.centerX, 380, 'Loading...', { fill: 'white' });
+        $.getJSON("../components/juego/niveles.json").done(function(data){
+            niveles = data;
+            console.log(niveles);
+        });
     },
-    // varios freebies found from google image search
-    loadImages: function() {
+
+    /**
+     * Preload is called first. Normally you'd use this to load your game assets 
+     * (or those needed for the current State) You shouldn't create any objects in this
+     * method that require assets that you're also loading in this method, as they won't yet be available.
+     */
+    preload: function() {
         game.load.image('menu-bg', '../components/juego/img/menu-bg.jpg');
         game.load.image('options-bg', '../components/juego/img/options-bg.jpg');
         game.load.image('gameover-bg', '../components/juego/img/gameover-bg.jpg');
@@ -39,44 +55,22 @@ bootState.prototype = {
         game.load.image('brand', '../components/juego/img/logo.png');
         game.load.image('stars', '../components/juego/img/stars.jpg');
         game.load.image('clouds', '../components/juego/img/metal-slug-3-clouds.png');
-        game.load.image('backgroundMS', '../components/juego/img/backgroundMS.gif');
+        
         game.load.image('backgroundKU', '../components/juego/img/ku-xlarge.png');
 
+        game.load.audio('bootMusic', '../components/juego/bgm/02 The Military System.mp3');
+        game.load.audio('ingameMusic', '../components/juego/bgm/04 Steel Beast.mp3');
+        game.load.audio('endMusic', '../components/juego/bgm/03 Main Theme From Metal Slug.mp3');
+        game.load.audio('blaster', '../components/juego/bgm/blaster.mp3');
     },
 
-    init: function() {
-        this.status = game.make.text(game.world.centerX, 380, 'Loading...', { fill: 'white' });
-    },
-
-    preload: function() {
-        this.loadImages();
-        this.loadBgm();
-    },
-
-    addGameStates: function() {
-
-        //game.load.script('juegoState', '../components/juego/juegoState.js');
-        //game.load.script('endState', '../components/juego/endState.js');
-        game.state.add("bootState", bootState);
-        game.state.add("juegoState", juegoState);
-        game.state.add("endState", endState);
-    },
-
-    addGameMusic: function() {
-        if (music) {
-            music.destroy();
-        }
-        music = game.add.audio('bootMusic');
-        music.loop = true;
-        music.play();
-    },
-
+    /**
+     * Create is called once preload has completed, this includes the loading of any assets from the Loader.
+     * If you don't have a preload method then create is the first method called in your State.
+     */
     create: function() {
-
         this.loadingBar = game.make.sprite(game.world.centerX - (387 / 2), 400, "loading");
         this.logo = game.make.sprite(game.world.centerX, 200, 'brand');
-
-
 
         centerGameObjects([this.logo, this.status]);
         function centerGameObjects(objects) {
@@ -91,24 +85,19 @@ bootState.prototype = {
         game.add.existing(this.status);
         this.load.setPreloadSprite(this.loadingBar);
 
-
-        //var txt = game.add.text(30, 280, 'Start');
-        // so how do we make it clickable?  We have to use .inputEnabled!
-        this.status.inputEnabled = true;
-        // Now every time we click on it, it says "You did it!" in the console!
-        this.status.events.onInputUp.add(function () { game.state.start("juegoState"); });
-
         this.status.setText('Start!');
-        this.addGameStates();
-        this.addGameMusic();
+        this.status.events.onInputUp.add(function () { game.state.start("juegoState"); });
+        this.status.inputEnabled = true;
+        
+        game.state.add("bootState", bootState);
+        game.state.add("juegoState", juegoState);
+        game.state.add("endState", endState);
 
-        /*setTimeout(function() {
-            if (!(game.world === null)) {
-                console.log("ESTO ES LO QUE TIENE GAME:")
-                console.log(game)
-                game.state.start("juegoState");
-                console.log("----NADA MAS----")
-            }
-        }, 6000);*/
+        if (music) {
+            music.destroy();
+        }
+        music = game.add.audio('bootMusic');
+        music.loop = true;
+        music.play();
     }
 };

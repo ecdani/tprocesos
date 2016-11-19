@@ -17,10 +17,6 @@ endState.prototype = {
         }
     },
 
-    preload: function () {
-
-    },
-
     addGameMusic: function () {
         music.destroy();
         if (victoria) {

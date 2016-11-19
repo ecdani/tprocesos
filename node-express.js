@@ -167,6 +167,8 @@ function borrarUsuario(nombre, callback) {
 	}
 }
 
+
+
 // Gallud ***************************************************************************************
 /** Persistencia estadisticas */
 
@@ -175,10 +177,11 @@ function borrarUsuario(nombre, callback) {
 /*Carga niveles desde JSON */
 
 app.get('/pedirNivel/:uid', function (request, response) {
-	var uid = request.params.uid;
+	/*var uid = request.params.uid;
 	var usuario = juego.obtnerUsuario(uid);
-	var json = { 'nivel': -1 }
+	var json = { 'nivel': -1 }*/
 	/** To be continued..... */
+	JSON.parse(fs.readFileSync('../components/juego/niveles.json'));
 });
 
 /* Ejemplo Gallud */

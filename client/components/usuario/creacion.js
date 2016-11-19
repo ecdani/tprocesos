@@ -1,5 +1,7 @@
 
-
+/**
+ * Función a ejecutar al cargar la pantalla de registro o creación
+ */
 function creacionExec() {
     $("#password, #validarpassword").keyup(checkPasswordMatch);
 
@@ -14,30 +16,3 @@ function creacionExec() {
         $('#control').empty();
     });
 }
-
-/*
-function crearUsuario(nombre, password, email) {
-    if (nombre == "") {
-        nombre = "jugador";
-    }
-    $.post("/crearUsuario", {
-        nombre: nombre,
-        password: password,
-        email: email,
-    },
-        function(data, status) {
-            callbackAutenticarse(data, status);
-        }).fail(function(jqXHR, textStatus, errorThrown) {
-            switch (jqXHR.status) {
-                case 409:
-                    console.log(jqXHR);
-                    $("#divCheckPasswordMatch").html("El nombre de usuario ya existe.");
-                    break;
-                case 500:
-                    console.log(jqXHR);
-                    $("#divCheckPasswordMatch").html("Error en el servidor.");
-                    break;
-                default:
-            }
-        });
-}*/

@@ -54,3 +54,20 @@ function mostrarJuego() {
     bootStateExec();
   });
 }
+
+/**
+ * Logout
+ */
+function logout() {
+    if (!(game.world === null)) {
+        game.destroy();
+    };
+    $.removeCookie("usuario");
+    mostrarIntro();
+    $('#status').empty();
+    $('.enlaceLogout').hide();
+    $('.enlaceEdicion').hide();
+    $('.enlaceCreacion').show();
+    $('.enlaceAutenticacion').show();
+}
+

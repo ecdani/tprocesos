@@ -1,10 +1,10 @@
 
-//var game = new Phaser.Game(800,600, Phaser.AUTO, 'juegoId', { preload: preload, create: create, update: update });
-//import * as control from "control";
 
-victoria = false;
+var victoria = false;
+var nivel = 0;
 
 juegoState = function () {
+    
     var player;
     var platforms;
     var cursors;
@@ -24,14 +24,24 @@ juegoState = function () {
 
 
 juegoState.prototype = {
+
+    /**
+     * Preload is called first. Normally you'd use this to load your game assets 
+     * (or those needed for the current State) You shouldn't create any objects in this
+     * method that require assets that you're also loading in this method, as they won't yet be available.
+     */
     preload: function () {
         game.load.image('sky', '../components/juego/img/sky.png');
         game.load.image('platform', '../components/juego/img/platform4.png');
         game.load.image('ground', '../components/juego/img/platform3.png');
-        game.load.image('star', '../components/juego/img/pangball.png');
+        
+        game.load.image('star', '../components/juego/img/pangball'+nivel+'.png');
+        game.load.image('backgroundMS', '../components/juego/img/backgroundMS'+nivel+'.gif');
+
         game.load.image('bullet', '../components/juego/img/shmup-bullet.png');
         game.load.spritesheet('dude', '../components/juego/img/neko.png', 32, 32);
     },
+
     updateContador: function () {
         segundos++;
         $('#time').text('' + segundos);
@@ -39,7 +49,6 @@ juegoState.prototype = {
     },
 
     create: function () {
-
         $('#vidas').text(this.vidas);
 
         music.destroy();
@@ -65,11 +74,15 @@ juegoState.prototype = {
 
         //ledge = platforms.create(-150, 250, 'ground');
         // ledge.body.immovable = true;
-
-        for (var i = 0; i < Math.random() * 10; i++) {
-            ledge = platforms.create(Math.random() * 1000, Math.random() * 1000, 'platform');
+       
+        for (var i = 0; i < niveles[nivel].platforms.length; i++) {
+            ledge = platforms.create( niveles[nivel].platforms[i].x, niveles[nivel].platforms[i].y, 'platform');
             ledge.body.immovable = true;
         }
+        /*for (var i = 0; i < Math.random() * 10; i++) {
+            ledge = platforms.create(Math.random() * 1000, Math.random() * 1000, 'platform');
+            ledge.body.immovable = true;
+        }*/
 
 
 
@@ -143,15 +156,7 @@ juegoState.prototype = {
     },
 
     /* Generacion de niveles a partir de JSON - Gallud */
-    pedirNivel: function () {
-        var usr = JOSN.parse($.cookie("usr"));
-        var uid = usr_id;
-        if (uid != undefined) {
-            $getJSON(url + "pedirNivel/" + uid, function (data) {
-                crearNivel(data);
-            })
-        }
-    },
+  
 
     crearNivel: function (data) {
         if (data.nivel < 0) {
@@ -260,9 +265,16 @@ juegoState.prototype = {
         }
 
         if (stars.checkAll('alive', false)) {
-            victoria = true;
-            console.log('VICTORIA');
-            game.state.start("endState");
+            if (nivel == 4) {
+                victoria = true;
+                nivel = 0;
+                console.log('VICTORIA');
+                game.state.start("endState");
+            } else {
+                nivel ++;
+                game.state.start("juegoState");
+            }
+            
         }
 
     },
