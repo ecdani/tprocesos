@@ -10,4 +10,14 @@ function loginExec() {
         usuario.password = $('#password').val();
         usuario.autenticarse(doneAutenticarse,failAutenticarse);
     });
+
+    $('#mailBtn').on('click', function (event) {
+        $.get("/confirmarCuenta").done(function(res){
+            console.log("ko mail");
+            console.log(res);
+        }).fail(function(){
+            console.log("fallo mail");
+            console.log(res);
+        });
+    });
 }

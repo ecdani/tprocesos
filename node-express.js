@@ -4,6 +4,7 @@ var MongoClient = require('mongodb').MongoClient; // V 3.2.10
 
 //var assert = require('assert');
 var exp = require("express");
+var mailer = require('express-mailer');
 var bodyParser = require('body-parser');
 
 var modelo = require("./servidor/modelo.js");
@@ -22,6 +23,21 @@ app.use(exp.static(__dirname + "/client"));
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
+mailer.extend(app, {
+  from: 'conquistanivelesgallud@gmail.com',
+  host: 'smtp.gmail.com', // hostname
+  secureConnection: true, // use SSL
+  port: 465, // port for secure SMTP
+  transportMethod: 'SMTP', // default is SMTP. Accepts anything that nodemailer accepts
+  auth: {
+    user: 'conquistanivelesgallud@gmail.com',
+    pass: 'chimpokomon'
+  }
+});
+
+app.set('views', __dirname + '/servidor/mail');
+app.set('view engine', 'jade');
+
 
 /**
  * Rutas de la app
@@ -31,6 +47,22 @@ app.get("/", function (request, response) {
 	var contenido = fs.readFileSync("./client/components/inicio/inicio.html");
 	response.setHeader("Content-type", "text/html");
 	response.send(contenido);
+});
+
+app.get('/confirmarCuenta', function (req, res, next) {
+  app.mailer.send('confirmacionCuenta', {
+    to: 'ec.dani@gmail.com', // REQUIRED. This can be a comma delimited string just like a normal email to field. 
+    subject: 'Test Email', // REQUIRED.
+    otherProperty: 'Other Property' // All additional properties are also passed to the template as local variables.
+  }, function (err) {
+    if (err) {
+      // handle error
+      console.log(err);
+      res.send('There was an error sending the email');
+      return;
+    }
+    res.send('Email Sent');
+  });
 });
 
 app.post('/crearUsuario', function (request, response) {
