@@ -1,5 +1,5 @@
 doctype html
-html
+html(style="color:white;background:#333;text-shadow: 0 1px 3px rgba(0,0,0,.5);text-align: center;")
   head
     meta(http-equiv = 'Content-Type', content = 'text/html; charset=UTF-8')
     title= subject
@@ -17,27 +17,27 @@ html
         |        background-color: #fff;
         |        border: 1px solid #fff;
         |    }
-        |    html,
-        |    body {
-        |        height: 100%;
-        |        background-color: #333;
-        |    }
-        |    body {
-        |        color: #fff;
-        |       text-align: center;
-        |        text-shadow: 0 1px 3px rgba(0,0,0,.5);
-        |    }
-    body
-      h1.h1 Lorem ipsum
+
+    body(style="color:white;background:#333;text-shadow: 0 1px 3px rgba(0,0,0,.5);text-align: center;margin-top:5px;padding: 5px;border-radius: 5px;")
+      h1(style="margin-top:5px;padding: 5px;border-radius: 5px;") Bienvenido a conquista niveles #{usuario.nombre} !
       p
-        strong Lorem ipsum dolor: 
-        | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        strong Por favor, haga clic en el siguiente enlace para para confirmar su cuenta de correo:
         br
-        |Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-      h2.h2 Lorem ipsum
-      p Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-      p Lorem ipsum:
-      ol
-        li Lorem ipsum dolor
-        li Lorem ipsum dolor
-        li Lorem ipsum dolor
+        a(href="http://tprocesos.herokuapp.com/confirmarCuenta/#{usuario.email}/#{usuario.token}")
+            | Deseo confirmar mi cuenta
+        br
+        |Gracias.
+      h2(style="font-size: 450%;margin:0px;background:#7E7E7E;border-radius: 5px;", width="250")
+        span(style="color:#000;") ♠
+        span(style="color:red;") ♥
+        span(style="color:black;") ♣
+        span(style="color:red;") ♦
+        br 
+        |KEEP CALM
+        br 
+        |AND
+        br
+        |CONQUER
+        br
+        |A LEVEL
+      p Si ha recibido este correo y no es el usuario responsable, por favor elimínelo.

@@ -1,5 +1,5 @@
-var request = require("request");
-//var url='https://proyectobase.herokuapp.com/';
+var request = require("request"); // https://www.npmjs.com/package/request
+//var url='https://tprocesos.herokuapp.com/';
 //var url='http://161.67.8.34:5000/';
 var url = 'http://127.0.0.1:1338/'
 var headers = {
@@ -8,15 +8,26 @@ var headers = {
 	'Content-Type': 'application/x-www-form-urlencoded'
 }
 
+var MongoClient = require('mongodb').MongoClient; // V 3.2.10
+var urlMongo = 'mongodb://tprocesos:tprocesos@ds135577.mlab.com:35577/procesos-gallud';
+var db;
+
 
 console.log("===========================================")
-console.log(" Inicio de las pruebas del API REST:");
-console.log(" 1. Crear usuario - 2. Iniciar sesión");
-console.log(" 3. Modificar usuario - 4. Eliminar usuario");
-console.log(" 5. El usuario no puede iniciar sesión");
+console.log(" Inicio de las pruebas de integracion del API REST:");
+console.log(" 1. Crear usuario");
+console.log(" 2. Validar usuario");
+console.log(" 3. Iniciar sesion");
+console.log(" 4. Editar usuario");
+console.log(" 5. Eliminar usuario");
 console.log(" URL: " + url);
 console.log("========================================== \n")
 
+/**
+ * Prueba básica de API de crear un usuario cualquiera
+ * @param email un email cualquiera de prueba.
+ * @param password contraseña cualquiera
+ */
 function crearUsuario(email, password) {
 	var options = {
 		url: url + 'crearUsuario',
@@ -26,148 +37,146 @@ function crearUsuario(email, password) {
 	}
 
 	console.log("--------------------------------------------------------");
-	console.log("1. Intentar crear el usuario pepe@pepe.es con clave pepe");
-	console.log("--------------------------------------------------------");
+	console.log("1. Intentar crear el usuario " + email + " con clave " + password);
 
 	request(options, function (error, response, body) {
-		if (!error && response.statusCode == 200) {
-			//console.log(body);
-			var jsonResponse = JSON.parse(body);
-			//uid=jsonResponse._id;
-			console.log(body);
-			//eliminarUsuario(jsonResponse._id);
-			//nivelCompletado(jsonResponse._id,20);
-			if (jsonResponse.email != undefined) {
-				console.log("Usuario " + jsonResponse.email + " creado correctamente");
-				console.log("Usuario uid: " + jsonResponse._id + "\n");
-				iniciarSesion(email, password);
+		console.log("	Resultado:");
+		console.log("	Error:               " + error);
+		console.log("	response.statusCode: " + response.statusCode);
+		console.log("	response.Message:    " + response.statusMessage);
+		console.log("	body:                " + body);
+		confirmarCuenta(email, password)
+	});
+}
+
+/**
+ * Prueba básica de API de validación del usuario, estos códigos se envian al mail
+ * Aquí los recogeremos y sólo se probará la invocación de la URL de validación
+ * @param email de un usuario existente.
+ * @param password contraseña del usuario
+ */
+function confirmarCuenta(email, password) {
+	console.log("---------------------------------------------");
+	console.log("Recuperando usuario...");
+	db.collection('usuarios').findOne({ 'email': email }, function (err, r) {
+		var options = {
+			url: url + 'confirmarCuenta/' + email + '/' + r.token,
+			method: 'GET',
+			headers: headers
+			//form: { email: email, password: password }
+		}
+		console.log(options.url);
+
+		console.log("---------------------------------------------");
+		console.log("2. Validación de la cuenta: " + email);
+
+		request(options, function (error, response, body) {
+			console.log("	Resultado:");
+			console.log("	Error:               " + error);
+			console.log("	response.statusCode: " + response.statusCode);
+			console.log("	response.Message:    " + response.statusMessage);
+			if (body.startsWith('<!doctype html>')) {
+				console.log("	body:	El body parece correcto");
+				autenticarse(r);
 			} else {
-				console.log("El usuario no se pudo registrar \n" + error);
+				console.log("	body: ¡NO PARECE CORRECTO!");
 			}
+		});
+	});
+}
+
+
+/**
+ * Prueba básica de API de inicio de sesión del usuario ya creado
+ * @param email de un usuario existente.
+ * @param password contraseña del usuario
+ */
+function autenticarse(usuario) {
+	var options = {
+		url: url + 'autenticarse',
+		method: 'POST',
+		headers: headers,
+		form: { email: usuario.email, password: usuario.password }
+	}
+
+	console.log("---------------------------------------------");
+	console.log("3. El usuario: " + usuario.email + " intenta iniciar sesion");
+
+	request(options, function (error, response, body) {
+		console.log("	Resultado:");
+		console.log("	Error:               " + error);
+		console.log("	response.statusCode: " + response.statusCode);
+		console.log("	response.Message:    " + response.statusMessage);
+		var jsonResponse = JSON.parse(body);
+		if (jsonResponse.usuarios[0].email == usuario.email) {
+			console.log("	body:	El body parece correcto");
+			editarUsuario(usuario, "PepeJuan");
 		} else {
-			console.log(response.statusCode);
+			console.log("	body: ¡NO PARECE CORRECTO!");
 		}
 	});
 }
 
-function iniciarSesion(email, password) {
+/**
+ * Prueba básica de actualizar el nombre del usuario
+ * @param objeto usuario a actualizar
+ * @param nombre nuevo
+ */
+function editarUsuario(usuario, nuevoNombre) {
 	var options = {
-		url: url + 'autenticarse',
+		url: url + 'editarUsuario/',
 		method: 'POST',
 		headers: headers,
-		form: { email: email, password: password }
+		form: { nombre: nuevoNombre, email: usuario.email, password: usuario.password }
 	}
-
-	console.log("---------------------------------------------");
-	console.log("2. El usuario: " + email + " intenta iniciar sesión");
-	console.log("---------------------------------------------");
-
+	console.log("-------------------------------------------------------------------");
+	console.log("4. El usuario: " + usuario.email + " intenta actualizar el nombre a " + nuevoNombre);
 	request(options, function (error, response, body) {
-		if (!error && response.statusCode == 200) {
-			//console.log(body);
-			var jsonResponse = JSON.parse(body);
-			//uid=jsonResponse._id;
-			//console.log(jsonResponse._id);
-			//eliminarUsuario(jsonResponse._id);
-			//nivelCompletado(jsonResponse._id,20);
-			if (jsonResponse.email != "") {
-				console.log("Usuario " + jsonResponse.email + " ha iniciado la sesión \n");
-				eliminarUsuario(jsonResponse._id);
-			}
-			else {
-				console.log("El usuario " + email + " NO pudo iniciar la sesión \n");
-			}
-		}
-		else {
-			console.log(response.statusCode);
+		console.log("	Resultado:");
+		console.log("	Error:               " + error);
+		console.log("	response.statusCode: " + response.statusCode);
+		console.log("	response.Message:    " + response.statusMessage);
+
+		var jsonResponse = JSON.parse(body);
+		if (jsonResponse.nombre == nuevoNombre) {
+			console.log("	body:	El body parece correcto");
+			borrarUsuario(usuario);
+		} else {
+			console.log("	body: ¡NO PARECE CORRECTO!");
 		}
 	});
 }
 
-function iniciarSesion2(email, password) {
+/**
+ * Prueba básica de eliminar el usuario
+ * @param objeto usuario a borrar
+ */
+function borrarUsuario(usuario) {
 	var options = {
-		url: url + 'autenticarse',
+		url: url + 'borrarUsuario/',
 		method: 'POST',
 		headers: headers,
-		form: { email: email, password: password }
+		form: usuario
 	}
-
 	console.log("---------------------------------------------");
-	console.log("5. El usuario: " + email + " intenta iniciar sesión");
-	console.log("---------------------------------------------");
-
+	console.log("5. Se intenta eliminar el usuario: " + usuario.email);
 	request(options, function (error, response, body) {
-		if (!error && response.statusCode == 200) {
-			//console.log(body);
-			var jsonResponse = JSON.parse(body);
-			//uid=jsonResponse._id;
-			//console.log(jsonResponse._id);
-			//eliminarUsuario(jsonResponse._id);
-			//nivelCompletado(jsonResponse._id,20);
-			if (jsonResponse.email != "") {
-				console.log("Usuario " + jsonResponse.email + " ha iniciado la sesión \n");
-			}
-			else {
-				console.log("El usuario " + email + " no pudo iniciar la sesión \n");
-			}
-		}
-		else {
-			console.log(response.statusCode);
-		}
-	});
-}
-/*
-function nivelCompletado(uid,tiempo){
-	var options={
-		url:url+'nivelCompletado/'+uid+'/'+tiempo,
-		method:'GET',
-		headers:headers,
-		//form:{email:email,password:password}
-	}
-
-	request(options,function(error,response,body){
-		if (!error && response.statusCode==200){
-			console.log(body);
-			var jsonResponse = JSON.parse( body) ;
-    		//uid=jsonResponse._id;
-    		console.log(jsonResponse.nivel);
-    		//eliminarUsuario(jsonResponse._id);
-		}
-		else{
-			console.log(response.statusCode);
-		}
-	});
-}*/
-
-
-function eliminarUsuario(uid) {
-	var options = {
-		url: url + 'borrarUsuario/' + uid,
-		method: 'DELETE',
-		headers: headers
-		//form:{email:email,password:password}
-	}
-
-	console.log("---------------------------------------------");
-	console.log("4. Se intenta eliminar el usuario: " + uid);
-	console.log("---------------------------------------------");
-	request(options, function (error, response, body) {
-		if (!error && response.statusCode == 200) {
-			//console.log(body);
-			var jsonResponse = JSON.parse(body);
-			if (jsonResponse.resultados == 1) {
-				console.log("Usuario " + uid + " eliminado \n");
-			}
-			else {
-				console.log("El usuarios no existe \n");
-			}
-		}
-		else {
-			console.log("Eliminar: Error al conectar");
-		}
-		iniciarSesion2('pepe@pepe.es', 'pepe');
+		console.log("	Resultado:");
+		console.log("	Error:               " + error);
+		console.log("	response.statusCode: " + response.statusCode);
+		console.log("	response.Message:    " + response.statusMessage);
+		console.log("	body:	             " + body);
+		console.log("===== Terminada ejecucion de pruebas =====");
 	});
 }
 
+/**
+ * Ejecución de pruebas
+ */
 
-crearUsuario('pepe@pepe.es', 'pepe');
+MongoClient.connect(urlMongo, conexion);
+function conexion(err, base) {
+	db = base;
+	crearUsuario('pepe@pepe.es', 'pepe');
+}
+

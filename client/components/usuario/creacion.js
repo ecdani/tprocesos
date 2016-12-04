@@ -11,8 +11,19 @@ function creacionExec() {
         var usuario = Singleton.getInstance();
         usuario.nombre = $('#nombre').val();
         usuario.password = $('#password').val();
-        usuario.crear(doneAutenticarse,failCrearUsuario);
+        usuario.email = $('#email').val();
+        usuario.crear(doneCreacion,failGenerico);
 
         $('#control').empty();
+    });
+}
+
+/**
+ * Funcionalidad posterior a creacion.
+ */
+function doneCreacion(juego, status) {
+    $('#control').load('../components/usuario/edicionValidarUsuario.html', function () {
+        //$('#enlaceCreacion').on('click', mostrarCreacion); // TODO REENVIAR EL MAIL.
+        $('#enlaceAutenticacion').on('click', mostrarAutenticacion);
     });
 }

@@ -36,10 +36,10 @@ function checkPasswordMatch() {
     var confirmPassword = $("#validarpassword").val();
 
     if (password != confirmPassword) {
-        $('#nombreBtn').prop("disabled", true);
+        $('#emailBtn').prop("disabled", true);
         $("#divCheckPasswordMatch").html("Las contraseñas no coinciden.");
     } else {
-        $('#nombreBtn').prop("disabled", false);
+        $('#emailBtn').prop("disabled", false);
         $("#divCheckPasswordMatch").html("Las contraseñas coinciden");
     }
 }
@@ -50,6 +50,8 @@ function checkPasswordMatch() {
 function Usuario() {
     this.nombre = '';
     this.password = ''; // Debería cifrarse
+    this.email = '';
+    this.token = null;
     this.scoremaximo = 0;
     this.partida = {};
 
@@ -60,7 +62,7 @@ function Usuario() {
      */
     this.autenticarse = function (done, fail) {
         $.post("/autenticarse", {
-            nombre: this.nombre,
+            email: this.email,
             password: this.password
         }).done(done).fail(fail);
     };
@@ -76,7 +78,8 @@ function Usuario() {
         }
         $.post("/crearUsuario", {
             nombre: this.nombre,
-            password: this.password
+            password: this.password,
+            email: this.email
         }).done(done).fail(fail);
     };
 
@@ -87,7 +90,7 @@ function Usuario() {
      */
     this.editar = function (done, fail) {
         $.post("/editarUsuario", {
-            nombre: this.nombre,
+            email: this.email,
             password: this.password
         }).done(done).fail(fail);
     };
@@ -99,7 +102,7 @@ function Usuario() {
      */
     this.borrar = function (done, fail) {
         $.post("/borrarUsuario", {
-            nombre: this.nombre
+            email: this.email
         }).done(done).fail(fail);
     };
 
@@ -111,10 +114,11 @@ function Usuario() {
         if (cookie) {
             pseudoUsuario = $.parseJSON(cookie);
             this.nombre = pseudoUsuario.nombre;
+            this.email = pseudoUsuario.email;
             this.password = pseudoUsuario.password;
             this.scoremaximo = pseudoUsuario.scoremaximo;
             this.partida = pseudoUsuario.partida;
-            err = this.autenticarse(doneAutenticarse, failAutenticarse);
+            err = this.autenticarse(doneAutenticarse, failGenerico);
             if (err) {
                 mostrarInfo();
                 console.log("Cookie incorrecta");
@@ -125,16 +129,6 @@ function Usuario() {
             console.log("No cookie");
         }
     }
-}
-
-/**
- * Funcionalidad posterior a la edición de un usuario.
- */
-function doneEditar(data, status) {
-    console.log('El usuario que llega de la edicion:')
-    console.log(data);
-    $.cookie("usuario", JSON.stringify(data));
-    $("#divCheckPasswordMatch").html("Usuario actualizado.");
 }
 
 
@@ -153,9 +147,15 @@ function doneAutenticarse(juego, status) {
     mostrarJuego();
 }
 
+function failGenerico(jqXHR, textStatus, errorThrown) {
+    console.log(jqXHR);
+    $("#autenticacionInfo").html(jqXHR.responseText);
+    return jqXHR;
+}
+
 /**
  * Funcionalidad en caso de fallo de la autenticacion.
- */
+ *//*
 function failAutenticarse(jqXHR, textStatus, errorThrown) {
     console.log(jqXHR);
     switch (jqXHR.status) {
@@ -166,17 +166,17 @@ function failAutenticarse(jqXHR, textStatus, errorThrown) {
             $("#autenticacionInfo").html("Error en el servidor.");
             break;
         case 401:
-            $("#autenticacionInfo").html("Contraseña incorrecta.");
+            $("#autenticacionInfo").html(jqXHR.responseText);
             break;
         default:
             console.log("Error Autenticacion");
     }
     return jqXHR;
-}
+}*/
 
 /**
  * Funcionalidad en caso de fallo de la creación/registro.
- */
+ *//*
 function failCrearUsuario(jqXHR, textStatus, errorThrown) {
     console.log(jqXHR);
     switch (jqXHR.status) {
@@ -188,11 +188,11 @@ function failCrearUsuario(jqXHR, textStatus, errorThrown) {
             break;
         default:
     }
-}
+}*/
 
 /**
  * Funcionalidad en caso de fallo del borrado
- */
+ *//*
 function failBorrar(jqXHR, textStatus, errorThrown) {
     console.log(jqXHR);
     switch (jqXHR.status) {
@@ -202,11 +202,11 @@ function failBorrar(jqXHR, textStatus, errorThrown) {
         default:
             $("#divCheckPasswordMatch").html("Error indeterminado.");
     }
-}
+}*/
 
 /**
  * Funcionalidad en caso de fallo de la edición
- */
+ *//*
 function failEditar(jqXHR, textStatus, errorThrown) {
     console.log(jqXHR);
     switch (jqXHR.status) {
@@ -219,4 +219,4 @@ function failEditar(jqXHR, textStatus, errorThrown) {
         default:
             $("#divCheckPasswordMatch").html("Error indeterminado.");
     }
-}
+}*/

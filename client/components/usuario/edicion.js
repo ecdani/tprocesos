@@ -10,19 +10,30 @@ function edicionExec() {
 
     $("#password, #validarpassword").keyup(checkPasswordMatch);
 
-    $('#nombreBtn').on('click', function(event) {
+    $('#nombreBtn').on('click', function (event) {
         event.preventDefault();
 
         var usuario = Singleton.getInstance();
         usuario.nombre = $('#nombre').val();
         usuario.password = $('#password').val();
-        usuario.editar(doneEditar, failEditar);
+        usuario.email = $('#email').val();
+        usuario.editar(doneEditar, failGenerico);
 
     });
 
-    $('#borrarBtn').on('click', function(event) {
+    $('#borrarBtn').on('click', function (event) {
         event.preventDefault();
         var usuario = Singleton.getInstance();
-        usuario.borrar(logout, failBorrar);
+        usuario.borrar(logout, failGenerico);
     });
+}
+
+/**
+ * Funcionalidad posterior a la edición de un usuario.
+ */
+function doneEditar(data, status) {
+    console.log('El usuario que llega de la edicion:')
+    console.log(data);
+    $.cookie("usuario", JSON.stringify(data));
+    $("#divCheckPasswordMatch").html("Usuario actualizado.");
 }

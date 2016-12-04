@@ -14,11 +14,17 @@ function Nivel(num) {
     this.nivel = num;
 }
 
-function Usuario(nombre,password) {
+function Usuario(nombre,password,email) {
     this.nombre = nombre;
     this.password = password; // Debería cifrarse
+    this.email = email;
     this.scoremaximo = 0;
     this.partida = {}
+    this.token = 0;
+    this.enabled = false;
+    this.crearToken = function() {
+        this.token = Math.random();
+    };
 }
 
 function Partida(){
