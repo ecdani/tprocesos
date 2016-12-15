@@ -24,6 +24,7 @@ console.log(" 6. Iniciar sesion, clave incorrecta");
 console.log(" 7. Iniciar sesion, usuario incorrecto");
 console.log(" 8. Editar usuario");
 console.log(" 9. Eliminar usuario");
+console.log(" 10. Eliminar usuario incorrecto");
 console.log(" URL: " + url);
 console.log("========================================== \n")
 
