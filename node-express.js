@@ -43,7 +43,7 @@ app.get("/", function (request, response) {
 });
 
 app.post('/crearUsuario', function (request, response) {
-	console.log(request.body);
+	//console.log(request.body);
 	var usuario = new modelo.Usuario(request.body.nombre, request.body.password, request.body.email);
 	usuario.crearToken();
 	insertarUsuario(usuario);
@@ -201,8 +201,8 @@ function editarUsuario(usuario, callback) {
 	db.collection('usuarios').findOneAndUpdate({ 'email': usuario.email }, usuario, { returnOriginal: false }, findOneAndUpdateCallback);
 	//{ $set: { 'password': usuario.password } }
 	function findOneAndUpdateCallback(err, r) {
-		console.log("Resultado nueva edicion");
-		console.log(r);
+		//console.log("Resultado nueva edicion");
+		//console.log(r);
 		callback(err, r.value);
 	}
 }
@@ -214,7 +214,7 @@ function borrarUsuario(usuario, callback) {
 	console.log("Borrado del usuario nombre:" + usuario.nombre);
 	db.collection('usuarios').deleteOne({ 'email': usuario.email }, deleteOneCallback);
 	function deleteOneCallback(err, r) {
-		console.log(r);
+		//console.log(r);
 		callback(err, r);
 	}
 }
