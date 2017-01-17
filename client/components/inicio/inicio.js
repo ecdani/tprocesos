@@ -4,6 +4,9 @@ $('.enlaceLogout').on('click', logout);
 $('.enlaceEdicion').on('click', mostrarEdicion);
 $('.enlaceCreacion').on('click', mostrarCreacion);
 $('.enlaceAutenticacion').on('click', mostrarAutenticacion);
+$('.enlaceEstadistica').on('click', mostrarEstadistica);
+$('.enlaceInfo').on('click', mostrarInfo);
+
 
 
 
@@ -11,6 +14,11 @@ function mostrarIntro() {
   $('#control').load('../components/inicio/intro.html', function () {
     $('#enlaceCreacion').on('click', mostrarCreacion);
     $('#enlaceAutenticacion').on('click', mostrarAutenticacion);
+  });
+}
+
+function mostrarInfo() {
+  $('#control').load('../components/info/info.html', function () {
   });
 }
 
@@ -45,6 +53,22 @@ function mostrarEdicion(event) {
   });
 }
 
+function mostrarEstadistica(event) {
+
+  $('#status').empty();
+  $.when(
+    $('#control').load('../components/estadistica/estadistica.html'),
+    $.getScript("../components/estadistica/estadistica.js")
+  ).then(function () {
+    estadisticaExec();
+    if (typeof game === 'undefined') { } else {
+      if (!(game.world === null)) {
+        game.destroy();
+      };
+    }
+  });
+}
+
 function mostrarJuego() {
   $.when(
     $.getScript("../components/juego/juegoState.js"),
@@ -59,15 +83,15 @@ function mostrarJuego() {
  * Logout
  */
 function logout() {
-    if (!(game.world === null)) {
-        game.destroy();
-    };
-    $.removeCookie("usuario");
-    mostrarIntro();
-    $('#status').empty();
-    $('.enlaceLogout').hide();
-    $('.enlaceEdicion').hide();
-    $('.enlaceCreacion').show();
-    $('.enlaceAutenticacion').show();
+  if (!(game.world === null)) {
+    game.destroy();
+  };
+  $.removeCookie("usuario");
+  mostrarIntro();
+  $('#status').empty();
+  $('.enlaceLogout').hide();
+  $('.enlaceEdicion').hide();
+  $('.enlaceCreacion').show();
+  $('.enlaceAutenticacion').show();
 }
 

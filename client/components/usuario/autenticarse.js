@@ -52,7 +52,8 @@ function Usuario() {
     this.password = ''; // Debería cifrarse
     this.email = '';
     this.token = null;
-    this.scoremaximo = 0;
+    this.segundos = [];
+    this.score = 0;
     this.partida = {};
 
     /**
@@ -91,7 +92,8 @@ function Usuario() {
     this.editar = function (done, fail) {
         $.post("/editarUsuario", {
             email: this.email,
-            password: this.password
+            password: this.password,
+            nombre: this.nombre
         }).done(done).fail(fail);
     };
 
@@ -105,6 +107,15 @@ function Usuario() {
             email: this.email
         }).done(done).fail(fail);
     };
+    
+    /**
+     * Carga el usuario desde la sesión en el servidor
+     */
+    this.loadSession = function (done, fail) {
+        $.get("/getUsuario", {
+            email: this.email
+        }).done(done).fail(fail);
+    };
 
     /**
      * Carga de la cookie de usuario el usuario.
@@ -115,8 +126,9 @@ function Usuario() {
             pseudoUsuario = $.parseJSON(cookie);
             this.nombre = pseudoUsuario.nombre;
             this.email = pseudoUsuario.email;
+            this.segundos = pseudoUsuario.segundos;
             this.password = pseudoUsuario.password;
-            this.scoremaximo = pseudoUsuario.scoremaximo;
+            this.score = pseudoUsuario.score;
             this.partida = pseudoUsuario.partida;
             err = this.autenticarse(doneAutenticarse, failGenerico);
             if (err) {
@@ -141,8 +153,18 @@ function doneAutenticarse(juego, status) {
     $('.enlaceAutenticacion').hide();
     $('.enlaceLogout').show();
     $('.enlaceEdicion').show();
+    console.log("Ejecutando doneAutenticarse");
+    usuario = Singleton.getInstance();
+    usuario.loadSession(function(data, status){
+        usuario.nombre = data.nombre;
+            usuario.email = data.email;
+            usuario.segundos = data.segundos;
+            usuario.password = data.password;
+            usuario.score = data.score;
+            usuario.partida = data.partida;
+        $.cookie("usuario", JSON.stringify(Singleton.getInstance()));
+    },failGenerico);    
 
-    $.cookie("usuario", JSON.stringify(Singleton.getInstance()));
 
     mostrarJuego();
 }

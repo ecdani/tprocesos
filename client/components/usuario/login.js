@@ -9,5 +9,6 @@ function loginExec() {
         usuario.email = $('#email').val();
         usuario.password = $('#password').val();
         usuario.autenticarse(doneAutenticarse,failGenerico);
+
     });
 }

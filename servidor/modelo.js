@@ -1,4 +1,23 @@
-function Juego() {
+var exports = module.exports = {};
+
+var MongoClient = require('mongodb').MongoClient; // V 3.2.10
+
+var db;
+
+var url = 'mongodb://tprocesos:tprocesos@ds135577.mlab.com:35577/procesos-gallud';
+
+MongoClient.connect(url, conexion);
+function conexion(err, base) {
+    db = base;
+}
+
+// TODO crear entidad estadistica
+exports.Partida = function () {
+    this.nivel = 1;
+    this.vidas = 3;
+}
+
+exports.Juego = function () {
     this.nombre = "Niveles";
     this.niveles = [];
     this.usuarios = [];
@@ -10,28 +29,130 @@ function Juego() {
     }
 }
 
-function Nivel(num) {
+exports.Nivel = function (num) {
     this.nivel = num;
 }
 
-function Usuario(nombre,password,email) {
-    this.nombre = nombre;
-    this.password = password; // Debería cifrarse
-    this.email = email;
-    this.scoremaximo = 0;
-    this.partida = {}
-    this.token = 0;
-    this.enabled = false;
-    this.crearToken = function() {
-        this.token = Math.random();
+exports.Usuarios = function () {
+
+    /**
+     * Obtener ranking
+     */
+    this.getEstadistica = function (callback) {
+        db.collection('usuarios').find({}).sort({ 'score': 1 }).toArray(function (err, docs) {
+            for (i = 0; i < docs.length; i++) {
+                docs[i].puesto = i+1;
+            }
+            //function findCallback(err, r) {
+            //console.log(r);
+            callback(err, docs);
+            //};
+            /*db.collection("usuarios").find({}).toArray(function(err,data){
+                callBack(err,data,response);
+            });*/
+        });
     };
 }
 
-function Partida(){
-    this.nivel = 1;
-    this.vidas = 3;
+exports.Usuario = function () {
+    this.nombre = '';
+    this.password = ''; // Debería cifrarse
+    this.email = '';
+    this.segundos = [-1, -1, -1, -1, -1];
+    this.score = 0;
+    this.partida = {};
+    this.token = 0;
+    this.enabled = false;
+
+    /**
+     * Crear token
+     */
+    this.crearToken = function () {
+        this.token = Math.random();
+        this.token = 22;
+    };
+
+    /**
+     * Insertar usuario
+     */
+    this.insertar = function () {
+        db.collection('usuarios').insertOne(this, callback);
+        function callback(err, r) {
+        };
+    };
+
+    /**
+     * Validar usuario
+     */
+    this.validar = function (tk, done, fail) {
+        if (this.token == tk) {
+            this.enabled = true;
+            this.editar(done);
+        } else {
+            fail();
+        }
+    }
+
+    /**
+     * Cargar usuario
+     */
+    this.cargar = function (callback) {
+        usuario = this;
+        db.collection('usuarios').findOne({ 'email': this.email }, cargarUsuariofindOneCallback);
+        function cargarUsuariofindOneCallback(err, r) {
+            usuario.nombre = r.nombre;
+            usuario.password = r.password;
+            usuario.email = r.email;
+            usuario.segundos = r.segundos;
+            usuario.score = r.score;
+            usuario.partida = r.partida;
+            usuario.token = r.token;
+            usuario.enabled = r.enabled;
+            console.log(r);
+            callback(err, r);
+        };
+    };
+    /**
+     * Cargar usuario desde sesión
+     */
+    this.loadSession = function (usuario) {
+        this.nombre = usuario.nombre;
+        this.password = usuario.password;
+        this.email = usuario.email;
+        this.segundos = usuario.segundos;
+        this.score = usuario.score;
+        this.partida = usuario.partida;
+        this.token = usuario.token;
+        this.enabled = usuario.enabled;
+    }
+
+    /**
+     * Editar usuario
+     */
+    this.editar = function (callback) {
+        console.log("This de editar");
+        console.log(this);
+        console.log("Edicion del usuario nombre:" + this.nombre);
+        db.collection('usuarios').findOneAndUpdate({ 'email': this.email }, this, { returnOriginal: false }, findOneAndUpdateCallback);
+        //{ $set: { 'password': usuario.password } }
+        function findOneAndUpdateCallback(err, r) {
+            //console.log("Resultado nueva edicion");
+            //console.log(r);
+            callback(err, r.value);
+        };
+    };
+
+    /**
+     * Borrar usuario
+     */
+    this.borrar = function (callback) {
+        console.log("Borrado del usuario nombre:" + this.nombre);
+        db.collection('usuarios').deleteOne({ 'email': this.email }, deleteOneCallback);
+        function deleteOneCallback(err, r) {
+            //console.log(r);
+            callback(err, r);
+        };
+    };
+
 }
 
-module.exports.Juego = Juego;
-module.exports.Nivel = Nivel;
-module.exports.Usuario = Usuario;

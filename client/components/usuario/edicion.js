@@ -6,7 +6,7 @@ function edicionExec() {
     var usuario = $.cookie("usuario");
     usuario = $.parseJSON(usuario);
     console.log(usuario)
-    $('#nombre').val(usuario.nombre);
+    $('#email').val(usuario.email);
 
     $("#password, #validarpassword").keyup(checkPasswordMatch);
 

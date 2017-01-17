@@ -15,8 +15,6 @@ juegoState = function () {
     this.score = 0;
     var scoreText;
     var timeText;
-    block = 0;
-    block2 = 0;
     var timer;
     segundos = 0;
     this.blaster = null;
@@ -42,12 +40,18 @@ juegoState.prototype = {
         game.load.spritesheet('dude', '../components/juego/img/neko.png', 32, 32);
     },
 
+    /**
+     * Lleva la cuenta en segundos
+     */
     updateContador: function () {
         segundos++;
         $('#time').text('' + segundos);
-        //timeText.setText('Tiempo: ' + this.segundos);
     },
 
+    /**
+     * Create is called once preload has completed, this includes the loading of any assets from the Loader.
+     * If you don't have a preload method then create is the first method called in your State.
+     */
     create: function () {
         $('#vidas').text(this.vidas);
 
@@ -108,7 +112,7 @@ juegoState.prototype = {
 
         player.animations.add('jump', [9, 8], 5, true);
         player.animations.add('fall', [11], 10, true);
-        player.animations.add('sleep', [5, 6], 0.6, true);
+        //player.animations.add('sleep', [5, 6], 0.6, true);
 
 
         stars = game.add.group(); //  Finally some stars to collect
@@ -133,7 +137,6 @@ juegoState.prototype = {
 
             star.body.collideWorldBounds = true;
             //star.body.setCircle(16);
-
 
         }
 
@@ -161,35 +164,20 @@ juegoState.prototype = {
 
     },
 
-    /* Generacion de niveles a partir de JSON - Gallud */
-
-
-    crearNivel: function (data) {
-        if (data.nivel < 0) {
-            noHayNiveles();
-        } else {
-            /** OMG está todo el juego */
-        }
-    },
-
-    sleep: function () {
-        player.animations.play('sleep');
-        block = 1;
-        block2 = 0;
-    },
-
-
+    /**
+     * The update method is left empty for your own use. It is called during the core game loop AFTER debug,
+     * physics, plugins and the Stage have had their preUpdate methods called. If is called BEFORE Stage,
+     * Tweens, Sounds, Input, Physics, Particles and Plugins have had their postUpdate methods called.
+     */
     update: function () {
 
-        //  Collide the player and the stars with the platforms
         game.physics.arcade.collide(player, platforms);
         game.physics.arcade.collide(stars, platforms);
         game.physics.arcade.collide(stars, stars);
-        //game.physics.arcade.collide(player, stars);
-        //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
+
         game.physics.arcade.overlap(player, stars, this.damageStar, null, this);
         game.physics.arcade.overlap(weapon.bullets, stars, this.collectStar, null, this);
-        game.physics.arcade.overlap(weapon.bullets, platforms, this.clearBullet, null, this);
+        game.physics.arcade.overlap(weapon.bullets, platforms, weapon.kill, null, this);
 
 
         //  Reset the players velocity (movement)
@@ -205,7 +193,6 @@ juegoState.prototype = {
             weapon.fire();
             blaster.play();
         }
-
 
         if (a.isDown) {
             if (w.isDown) {
@@ -266,11 +253,10 @@ juegoState.prototype = {
                 //player.animations.play('sleep');
             }
         } else {
-            //  Stand still
             if (s.isDown) {
-                if (player.body.velocity.x < 0){
+                if (player.body.velocity.x < 0) {
                     player.body.velocity.x = -50;
-                } else if (player.body.velocity.x > 0){
+                } else if (player.body.velocity.x > 0) {
                     player.body.velocity.x = 50;
                 }
             }
@@ -281,10 +267,21 @@ juegoState.prototype = {
             player.body.velocity.y = -350;
             player.animations.play('jump');
         }
+        this.checkVictory();
+    },
 
+    /**
+     * Comprobamos si se han alcanzado las condiciones de victoria e informamos al server
+     */
+    checkVictory: function () {
         if (stars.checkAll('alive', false)) {
+            $.post("/nivelCompletado", {
+                //victoria: victoria,
+                segundos: segundos,
+                nivel: nivel
+            });
             if (nivel == 4) {
-                victoria = true;
+                //victoria = true;
                 nivel = 0;
                 console.log('VICTORIA');
                 game.state.start("endState");
@@ -294,37 +291,27 @@ juegoState.prototype = {
             }
 
         }
-
     },
 
-    clearBullet: function (weapon, platform) {
-        weapon.kill();
-    },
-
+    /**
+     * Acciones al matar una 'estrella'
+     */
     collectStar: function (weapon, star) {
-
         // Removes the star from the screen
         star.kill();
         weapon.kill();
 
         //  Add and update the score
         this.score += 10;
-        //scoreText.text = 'Score: ' + this.score;
-        //timeText.text = 'Tiempo:' +time;
         $('#score').text(this.score.toString());
     },
 
+    /**
+     * Acciones al chocar con una 'estrella'
+     */
     damageStar: function (player, star) {
-
-        // Removes the star from the screen
         star.kill();
-
-
-
-        //  Add and update the score
         this.vidas -= 1;
-        //scoreText.text = 'Score: ' + this.score;
-        //timeText.text = 'Tiempo:' +time;
         if (this.vidas == 0) {
             victoria = false;
             game.state.start("endState");
@@ -332,9 +319,11 @@ juegoState.prototype = {
         }
         $('#vidas').text(this.vidas);
     },
+
+    /**
+     * Información de depuración
+     */
     render: function () {
-
         weapon.debug();
-
     }
 }

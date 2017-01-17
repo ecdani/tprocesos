@@ -3,18 +3,24 @@ var fs = require("fs");
 var exp = require("express");
 var mailer = require('express-mailer');
 var bodyParser = require('body-parser');
-var MongoClient = require('mongodb').MongoClient; // V 3.2.10
+
+var session = require('express-session');
 var modelo = require("./servidor/modelo.js");
 
-var url = 'mongodb://tprocesos:tprocesos@ds135577.mlab.com:35577/procesos-gallud';
 var app = exp();
 var juego;
-var db;
+
+var sess;
 
 //app.use(app.router);
 app.use(exp.static(__dirname + "/client"));
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+app.use(session({
+	secret: '8923j8deyddalxi27zzz81M19us',
+	resave: true,
+	saveUninitialized: true
+}));
 
 mailer.extend(app, {
 	from: 'conquistanivelesgallud@gmail.com',
@@ -36,17 +42,22 @@ app.set('view engine', 'jade');
  * Rutas de la app
  */
 
-app.get("/", function (request, response) {
+app.get("/", function (req, res) {
 	var contenido = fs.readFileSync("./client/components/inicio/inicio.html");
-	response.setHeader("Content-type", "text/html");
-	response.send(contenido);
+	res.setHeader("Content-type", "text/html");
+	res.send(contenido);
 });
 
-app.post('/crearUsuario', function (request, response) {
-	//console.log(request.body);
-	var usuario = new modelo.Usuario(request.body.nombre, request.body.password, request.body.email);
+app.post('/crearUsuario', function (req, res) {
+	//console.log(req.body);
+	var usuario = req.session.usuario;
+	usuario = new modelo.Usuario();
+	usuario.nombre = req.body.nombre;
+	usuario.password = req.body.password;
+	usuario.email = req.body.email;
+
 	usuario.crearToken();
-	insertarUsuario(usuario);
+	usuario.insertar();
 
 	app.mailer.send('confirmacionCuenta', {
 		to: usuario.email, // REQUIRED. This can be a comma delimited string just like a normal email to field. 
@@ -56,77 +67,109 @@ app.post('/crearUsuario', function (request, response) {
 		if (err) {
 			// handle error
 			console.log(err);
-			response.status(500).send('There was an error sending the email');
+			res.status(500).send('There was an error sending the email');
 			return;
 		}
-		response.status(200).send('Email de confirmación enviado');
+		res.status(200).send('Email de confirmación enviado');
 	});
 });
 
-app.get("/confirmarCuenta/:email/:token", function (request, response) {
-	console.log("Llamada a confirmar cuenta")
-	var email = request.params.email;
-	var token = request.params.token;
+app.get("/confirmarCuenta/:email/:token", function (req, res) {
+	console.log("Confirmando cuenta...")
+	//var email = req.params.email;
+	var token = req.params.token;
 
-	cargarUsuario(email, callback);
+	var usuario = req.session.usuario;
+	usuario = new modelo.Usuario();
+	usuario.email = req.params.email;
+	usuario.cargar(callback);
 
 	function callback(err, doc) {
 		if (err) {
-			response.status(500).send('Error en el servidor.');
+			res.status(500).send('Error en el servidor.');
 		} else if (doc) {
-			if (doc.token == token) {
-				doc.enabled = true;
-				editarUsuario(doc, callbackHabilitar);
-				function callbackHabilitar(err, doc) {
-					var contenido = fs.readFileSync("./client/components/inicio/inicioValidado.html");
-					response.setHeader("Content-type", "text/html");
-					response.send(contenido);
-				}
-			} else {
-				response.status(401).send('Error de token.');
-			}
+			//console.log(usuario);
+			usuario.validar(token, doneValidar, failValidar);
 		} else {
-			response.status(404).send('Usuario no encontrado');
+			res.status(404).send('Usuario no encontrado');
+		}
+	}
+
+	function doneValidar(err, doc) {
+		req.session.usuario = usuario;
+		var contenido = fs.readFileSync("./client/components/inicio/inicioValidado.html");
+		res.setHeader("Content-type", "text/html");
+		res.send(contenido);
+	}
+
+	function failValidar(err, doc) {
+		res.status(401).send('Error de token.');
+	}
+
+});
+
+app.get('/getUsuario', function (req, res) {
+	console.log("Obteniendo cuenta...")
+	//var email = req.params.email;
+	res.status(200).send(req.session.usuario);
+	//var usuario = req.session.usuario;
+	//usuario = new modelo.Usuario();
+	//usuario.email = req.params.email;
+	//usuario.cargar(callback);
+
+});
+
+app.post('/editarUsuario', function (req, res) {
+	console.log("Mostrando la sesion en la petición de edición de usuario:");
+	console.log(req.session);
+	console.log("Mostrando el req.body:");
+	console.log(req.body);
+	//var usuario = req.session.usuario;
+	usuario = new modelo.Usuario();
+	usuario.loadSession(req.session.usuario);
+
+	usuario.nombre = req.body.nombre;
+	usuario.password = req.body.password;
+	usuario.email = req.body.email;
+
+	usuario.editar(callback);
+	function callback(err, doc) {
+		if (err) {
+			res.status(500).send('Error en el servidor.');
+		} else {
+			req.session.usuario = usuario;
+			res.send(doc);
 		}
 	}
 });
 
-app.post('/editarUsuario', function (request, response) {
+app.post('/borrarUsuario', function (req, res) {
+	usuario = new modelo.Usuario();
+	usuario.loadSession(req.session.usuario);
 
-	var usuario = new modelo.Usuario(request.body.nombre, request.body.password, request.body.email);
-	editarUsuario(usuario, callback);
+	usuario.borrar(callback);
 	function callback(err, doc) {
 		if (err) {
-			response.status(500).send('Error en el servidor.');
+			res.status(500).send('Error en el servidor.');
 		} else {
-			response.send(doc);
+			res.status(204).send('Usuario borrado');
 		}
 	}
 });
 
-app.post('/borrarUsuario', function (request, response) {
+app.post('/autenticarse', function (req, res) {
+	req.session.usuario = new modelo.Usuario();
+	var usuario = req.session.usuario;
 
-	var usuario = new modelo.Usuario(request.body.nombre, request.body.password, request.body.email);
+	usuario.email = req.body.email;
+	//var email = req.body.email;
+	var password = req.body.password;
 
-	borrarUsuario(usuario, callback);
-	function callback(err, doc) {
-		if (err) {
-			response.status(500).send('Error en el servidor.');
-		} else {
-			response.status(204).send('Usuario borrado');
-		}
-	}
-});
-
-app.post('/autenticarse', function (request, response) {
-	var email = request.body.email;
-	var password = request.body.password;
-
-	cargarUsuario(email, callback);
+	usuario.cargar(callback);
 
 	function callback(err, doc) {
 		if (err) {
-			response.status(500).send('Error en el servidor.');
+			res.status(500).send('Error en el servidor.');
 		} else if (doc) {
 			if (doc.password == password) {
 				if (doc.enabled == true) {
@@ -134,29 +177,87 @@ app.post('/autenticarse', function (request, response) {
 					this.juego.agregarNivel(new modelo.Nivel("1"));
 					this.juego.agregarUsuario(doc); /** PODRIA CAMIAR EN crear */
 
-					response.status(200).send(this.juego);
+					res.status(200).send(this.juego);
 				} else {
-					response.status(401).send('Usuario no validado aún. Por favor revise su correo y confirme la cuenta.');
+					res.status(401).send('Usuario no validado aún. Por favor revise su correo y confirme la cuenta.');
 				}
 			} else {
-				response.status(401).send('Error de contraseña.');
+				res.status(401).send('Error de contraseña.');
 			}
 		} else {
-			response.status(404).send('Usuario no encontrado');
+			res.status(404).send('Usuario no encontrado');
 		}
 	}
 });
 
-app.get('/estadistica', function (request, response) {
+app.get('/estadistica', function (req, res) {
 	var contenido = fs.readFileSync("./client/components/estadistica/estadistica.html");
-	response.setHeader("Content-type", "text/html");
-	response.send(contenido);
+	res.setHeader("Content-type", "text/html");
+	res.send(contenido);
 });
 
-app.get('/nivelCompletado'), function (request, response) {
-	var tiempo = request.params.tiempo
+app.get('/estadistica.json', function (req, res) {
+	usuarios = new modelo.Usuarios();
+	usuarios.getEstadistica(callback);
+
+	function callback(err, docs) {
+		if (err) {
+			res.status(500).send('Error en el servidor.');
+		} else if (docs) {
+			console.log("LA SALIDA DE ESTADISTICA:");
+			console.log(docs);
+			res.send(docs);
+				/*if (doc.enabled == true) {
+					this.juego = new modelo.Juego();
+					this.juego.agregarNivel(new modelo.Nivel("1"));
+					this.juego.agregarUsuario(doc);
+
+					res.status(200).send(this.juego);
+				} else {
+					res.status(401).send('Usuario no validado aún. Por favor revise su correo y confirme la cuenta.');
+				}*/
+		} else {
+			res.status(404).send('Estadistica no encontrada');
+		}
+	}
+	
+});
+
+app.post('/nivelCompletado', function (req, res) {
+	var usuario = new modelo.Usuario();
+	usuario.loadSession(req.session.usuario);
+	//var estadistica = 
+	//usuario.nombre = req.body.victoria;
+	console.log("Registrando nivel completado");
+
+	console.log("Es una victoria");
+	console.log(usuario);
+	console.log(req.body);
+	if (usuario.segundos[req.body.nivel] > parseInt(req.body.segundos) || usuario.segundos[parseInt(req.body.nivel)] == -1) {
+		console.log("Reasigno segundos" + req.body.segundos);
+		usuario.segundos[req.body.nivel] = parseInt(req.body.segundos);
+		usuario.score = 0;
+		for ( i = 0; i < usuario.segundos.length; i++ ) {
+      		usuario.score += usuario.segundos[i];
+   		}
+	}
+
+	usuario.editar(callback);
+	function callback(err, doc) {
+		if (err) {
+			res.status(500).send('Error en el servidor.');
+		} else {
+			req.session.usuario = usuario;
+			res.send(doc);
+		}
+	}
+	//usuario.segundos[req.body.nivel] = req.body.segundos;
+	//usuario.nombre = req.body.nivel;
+
+
+	//var tiempo = req.params.tiempo
 	//update mongo
-}
+});
 
 /**
  * Lanzar servidor
@@ -165,56 +266,3 @@ app.get('/nivelCompletado'), function (request, response) {
 console.log("Servidor escuchando en el puerto " + 1338);
 app.listen(process.env.PORT || 1338);
 
-MongoClient.connect(url, conexion);
-function conexion(err, base) {
-	db = base;
-}
-
-/*******************************
- * Funciones de Mongo DB       *
- *******************************/
-
-/**
- * Insertar usuario
- */
-function insertarUsuario(usuario) {
-	db.collection('usuarios').insertOne(usuario, callback);
-	function callback(err, r) {
-	}
-}
-
-/**
- * Cargar usuario
- */
-function cargarUsuario(email, callback) {
-	db.collection('usuarios').findOne({ 'email': email }, cargarUsuariofindOneCallback);
-	function cargarUsuariofindOneCallback(err, r) {
-		callback(err, r);
-	}
-}
-
-/**
- * Editar usuario
- */
-function editarUsuario(usuario, callback) {
-	console.log("Edicion del usuario nombre:" + usuario.nombre);
-	db.collection('usuarios').findOneAndUpdate({ 'email': usuario.email }, usuario, { returnOriginal: false }, findOneAndUpdateCallback);
-	//{ $set: { 'password': usuario.password } }
-	function findOneAndUpdateCallback(err, r) {
-		//console.log("Resultado nueva edicion");
-		//console.log(r);
-		callback(err, r.value);
-	}
-}
-
-/**
- * Borrar usuario
- */
-function borrarUsuario(usuario, callback) {
-	console.log("Borrado del usuario nombre:" + usuario.nombre);
-	db.collection('usuarios').deleteOne({ 'email': usuario.email }, deleteOneCallback);
-	function deleteOneCallback(err, r) {
-		//console.log(r);
-		callback(err, r);
-	}
-}

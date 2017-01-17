@@ -3,6 +3,9 @@
     width: 800px;
     height: 600px;
 }
+#logo {
+    height: 150px;
+}
 
 input {
   color: #333;
@@ -14,4 +17,16 @@ input {
 .autenticacionForm {
     margin: auto;
     width: 400px;
+}
+
+.imgCenter {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 25px;
+    border: 2px solid dimgray;
+    width: 170px;
+    height: 170px;
+    padding: 10px;
+    margin-top: 10px;
 }
