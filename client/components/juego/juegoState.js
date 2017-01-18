@@ -275,13 +275,14 @@ juegoState.prototype = {
      */
     checkVictory: function () {
         if (stars.checkAll('alive', false)) {
+            console.log('registrando Nivel completado')
             $.post("/nivelCompletado", {
                 //victoria: victoria,
                 segundos: segundos,
                 nivel: nivel
             });
             if (nivel == 4) {
-                //victoria = true;
+                victoria = true;
                 nivel = 0;
                 console.log('VICTORIA');
                 game.state.start("endState");
@@ -289,6 +290,7 @@ juegoState.prototype = {
                 nivel++;
                 game.state.start("juegoState");
             }
+            $('#nivel').html(nivel);
 
         }
     },

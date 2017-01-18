@@ -49,15 +49,35 @@ app.get("/", function (req, res) {
 });
 
 app.post('/crearUsuario', function (req, res) {
-	//console.log(req.body);
-	var usuario = req.session.usuario;
-	usuario = new modelo.Usuario();
+	var usuario = new modelo.Usuario();
+	
 	usuario.nombre = req.body.nombre;
 	usuario.password = req.body.password;
 	usuario.email = req.body.email;
 
 	usuario.crearToken();
 	usuario.insertar();
+
+	req.session.usuario = usuario;
+	app.mailer.send('confirmacionCuenta', {
+		to: usuario.email, // REQUIRED. This can be a comma delimited string just like a normal email to field. 
+		subject: 'Test Email', // REQUIRED.
+		usuario: usuario // All additional properties are also passed to the template as local variables.
+	}, function (err) {
+		if (err) {
+			// handle error
+			console.log(err);
+			res.status(500).send('There was an error sending the email');
+			return;
+		}
+		res.status(200).send('Email de confirmación enviado');
+	});
+});
+
+app.get('/reenviarMail', function (req, res) {
+	//console.log(req.body);
+	var usuario = new modelo.Usuario();
+	usuario.loadSession(req.session.usuario);
 
 	app.mailer.send('confirmacionCuenta', {
 		to: usuario.email, // REQUIRED. This can be a comma delimited string just like a normal email to field. 
@@ -73,6 +93,7 @@ app.post('/crearUsuario', function (req, res) {
 		res.status(200).send('Email de confirmación enviado');
 	});
 });
+
 
 app.get("/confirmarCuenta/:email/:token", function (req, res) {
 	console.log("Confirmando cuenta...")
@@ -110,13 +131,7 @@ app.get("/confirmarCuenta/:email/:token", function (req, res) {
 
 app.get('/getUsuario', function (req, res) {
 	console.log("Obteniendo cuenta...")
-	//var email = req.params.email;
 	res.status(200).send(req.session.usuario);
-	//var usuario = req.session.usuario;
-	//usuario = new modelo.Usuario();
-	//usuario.email = req.params.email;
-	//usuario.cargar(callback);
-
 });
 
 app.post('/editarUsuario', function (req, res) {
@@ -173,11 +188,11 @@ app.post('/autenticarse', function (req, res) {
 		} else if (doc) {
 			if (doc.password == password) {
 				if (doc.enabled == true) {
-					this.juego = new modelo.Juego();
+					/*this.juego = new modelo.Juego();
 					this.juego.agregarNivel(new modelo.Nivel("1"));
-					this.juego.agregarUsuario(doc); /** PODRIA CAMIAR EN crear */
+					this.juego.agregarUsuario(doc);*/ /** PODRIA CAMIAR EN crear */
 
-					res.status(200).send(this.juego);
+					res.status(200).send("Autenticado");
 				} else {
 					res.status(401).send('Usuario no validado aún. Por favor revise su correo y confirme la cuenta.');
 				}
@@ -207,15 +222,6 @@ app.get('/estadistica.json', function (req, res) {
 			console.log("LA SALIDA DE ESTADISTICA:");
 			console.log(docs);
 			res.send(docs);
-				/*if (doc.enabled == true) {
-					this.juego = new modelo.Juego();
-					this.juego.agregarNivel(new modelo.Nivel("1"));
-					this.juego.agregarUsuario(doc);
-
-					res.status(200).send(this.juego);
-				} else {
-					res.status(401).send('Usuario no validado aún. Por favor revise su correo y confirme la cuenta.');
-				}*/
 		} else {
 			res.status(404).send('Estadistica no encontrada');
 		}
@@ -226,19 +232,21 @@ app.get('/estadistica.json', function (req, res) {
 app.post('/nivelCompletado', function (req, res) {
 	var usuario = new modelo.Usuario();
 	usuario.loadSession(req.session.usuario);
-	//var estadistica = 
-	//usuario.nombre = req.body.victoria;
+
 	console.log("Registrando nivel completado");
 
-	console.log("Es una victoria");
 	console.log(usuario);
 	console.log(req.body);
-	if (usuario.segundos[req.body.nivel] > parseInt(req.body.segundos) || usuario.segundos[parseInt(req.body.nivel)] == -1) {
+	if (usuario.segundos[req.body.nivel] > parseInt(req.body.segundos) || usuario.segundos[parseInt(req.body.nivel)] == '?') {
 		console.log("Reasigno segundos" + req.body.segundos);
 		usuario.segundos[req.body.nivel] = parseInt(req.body.segundos);
+		
 		usuario.score = 0;
 		for ( i = 0; i < usuario.segundos.length; i++ ) {
-      		usuario.score += usuario.segundos[i];
+			if (usuario.segundos[i] != '?'){
+				usuario.score += usuario.segundos[i];
+			}
+			
    		}
 	}
 
@@ -251,18 +259,11 @@ app.post('/nivelCompletado', function (req, res) {
 			res.send(doc);
 		}
 	}
-	//usuario.segundos[req.body.nivel] = req.body.segundos;
-	//usuario.nombre = req.body.nivel;
-
-
-	//var tiempo = req.params.tiempo
-	//update mongo
 });
 
 /**
  * Lanzar servidor
  */
-
 console.log("Servidor escuchando en el puerto " + 1338);
 app.listen(process.env.PORT || 1338);
 

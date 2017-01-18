@@ -5,14 +5,14 @@
 function creacionExec() {
     $("#password, #validarpassword").keyup(checkPasswordMatch);
 
-    $('#nombreBtn').on('click', function(event) {
+    $('#nombreBtn').on('click', function (event) {
         event.preventDefault();
 
         var usuario = Singleton.getInstance();
         usuario.nombre = $('#nombre').val();
         usuario.password = $('#password').val();
         usuario.email = $('#email').val();
-        usuario.crear(doneCreacion,failGenerico);
+        usuario.crear(doneCreacion, failGenerico);
 
         $('#control').empty();
     });
@@ -23,7 +23,13 @@ function creacionExec() {
  */
 function doneCreacion(juego, status) {
     $('#control').load('../components/usuario/edicionValidarUsuario.html', function () {
-        //$('#enlaceCreacion').on('click', mostrarCreacion); // TODO REENVIAR EL MAIL.
+        $('#enlaceCreacion').on('click', function () {
+             $("#divCheckPasswordMatch").html("Reenviando...");
+            $.get('reenviarMail',function (){
+                $("#divCheckPasswordMatch").html("Mail reenviado.");
+            });
+        }
+        );
         $('#enlaceAutenticacion').on('click', mostrarAutenticacion);
     });
 }

@@ -11,12 +11,7 @@ function conexion(err, base) {
     db = base;
 }
 
-// TODO crear entidad estadistica
-exports.Partida = function () {
-    this.nivel = 1;
-    this.vidas = 3;
-}
-
+/*
 exports.Juego = function () {
     this.nombre = "Niveles";
     this.niveles = [];
@@ -27,11 +22,8 @@ exports.Juego = function () {
     this.agregarUsuario = function (usuario) {
         this.usuarios.push(usuario);
     }
-}
+}*/
 
-exports.Nivel = function (num) {
-    this.nivel = num;
-}
 
 exports.Usuarios = function () {
 
@@ -41,15 +33,14 @@ exports.Usuarios = function () {
     this.getEstadistica = function (callback) {
         db.collection('usuarios').find({}).sort({ 'score': 1 }).toArray(function (err, docs) {
             for (i = 0; i < docs.length; i++) {
-                docs[i].puesto = i+1;
+                docs[i].puesto = i + 1;
+                docs[i].score1 = docs[i].segundos[0];
+                docs[i].score2 = docs[i].segundos[1];
+                docs[i].score3 = docs[i].segundos[2];
+                docs[i].score4 = docs[i].segundos[3];
+                docs[i].score5 = docs[i].segundos[4];
             }
-            //function findCallback(err, r) {
-            //console.log(r);
             callback(err, docs);
-            //};
-            /*db.collection("usuarios").find({}).toArray(function(err,data){
-                callBack(err,data,response);
-            });*/
         });
     };
 }
@@ -58,8 +49,8 @@ exports.Usuario = function () {
     this.nombre = '';
     this.password = ''; // Debería cifrarse
     this.email = '';
-    this.segundos = [-1, -1, -1, -1, -1];
-    this.score = 0;
+    this.segundos = ['?', '?', '?', '?', '?'];
+    this.score = '?';
     this.partida = {};
     this.token = 0;
     this.enabled = false;
@@ -100,15 +91,16 @@ exports.Usuario = function () {
         usuario = this;
         db.collection('usuarios').findOne({ 'email': this.email }, cargarUsuariofindOneCallback);
         function cargarUsuariofindOneCallback(err, r) {
-            usuario.nombre = r.nombre;
-            usuario.password = r.password;
-            usuario.email = r.email;
-            usuario.segundos = r.segundos;
-            usuario.score = r.score;
-            usuario.partida = r.partida;
-            usuario.token = r.token;
-            usuario.enabled = r.enabled;
-            console.log(r);
+            if (!err && (r != null)) {
+                usuario.nombre = r.nombre;
+                usuario.password = r.password;
+                usuario.email = r.email;
+                usuario.segundos = r.segundos;
+                usuario.score = r.score;
+                usuario.partida = r.partida;
+                usuario.token = r.token;
+                usuario.enabled = r.enabled;
+            }
             callback(err, r);
         };
     };

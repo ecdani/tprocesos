@@ -10,7 +10,7 @@ function bootStateExec() {
     $('#control').empty();
     game = new Phaser.Game(660, 600, Phaser.AUTO, 'control', bootState);
     $('#status').load('../components/juego/status.html', function() {
-        $('#nivel').html(usuario.nivel)
+        $('#nivel').html("0")
         $('#nombre').html(usuario.nombre)
         $('#vidas').html(usuario.vidas)
     });

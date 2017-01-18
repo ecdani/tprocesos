@@ -53,7 +53,7 @@ function Usuario() {
     this.email = '';
     this.token = null;
     this.segundos = [];
-    this.score = 0;
+    this.score = '?';
     this.partida = {};
 
     /**
@@ -107,20 +107,31 @@ function Usuario() {
             email: this.email
         }).done(done).fail(fail);
     };
-    
+
     /**
      * Carga el usuario desde la sesión en el servidor
      */
-    this.loadSession = function (done, fail) {
+    this.loadSession = function (done,fail) {
         $.get("/getUsuario", {
             email: this.email
+        }).done(function (data, status) {
+            console.log("RECUPERANDO CON LOAD SESSION");
+            console.log(data);
+            this.nombre = data.nombre;
+            this.email = data.email;
+            this.segundos = data.segundos;
+            this.password = data.password;
+            this.score = data.score;
+            this.partida = data.partida;
+            $.cookie("usuario", JSON.stringify(this));
+            //done(data,status);
         }).done(done).fail(fail);
     };
 
     /**
      * Carga de la cookie de usuario el usuario.
      */
-    this.loadCookie = function() {
+    this.loadCookie = function () {
         var cookie = $.cookie("usuario");
         if (cookie) {
             pseudoUsuario = $.parseJSON(cookie);
@@ -155,16 +166,7 @@ function doneAutenticarse(juego, status) {
     $('.enlaceEdicion').show();
     console.log("Ejecutando doneAutenticarse");
     usuario = Singleton.getInstance();
-    usuario.loadSession(function(data, status){
-        usuario.nombre = data.nombre;
-            usuario.email = data.email;
-            usuario.segundos = data.segundos;
-            usuario.password = data.password;
-            usuario.score = data.score;
-            usuario.partida = data.partida;
-        $.cookie("usuario", JSON.stringify(Singleton.getInstance()));
-    },failGenerico);    
-
+    usuario.loadSession(function(data, status){},failGenerico);
 
     mostrarJuego();
 }
