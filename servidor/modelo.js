@@ -50,7 +50,6 @@ exports.Usuario = function () {
      */
     this.crearToken = function () {
         this.token = Math.random();
-        this.token = 22;
     };
 
     /**
