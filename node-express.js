@@ -23,14 +23,14 @@ app.use(session({
 }));
 
 mailer.extend(app, {
-	from: 'conquistanivelesgallud@gmail.com',
+	from: 'asignaturagallud@gmail.com',
 	host: 'smtp.gmail.com', // hostname
 	secureConnection: true, // use SSL
 	port: 465, // port for secure SMTP
 	transportMethod: 'SMTP', // default is SMTP. Accepts anything that nodemailer accepts
 	auth: {
-		user: 'conquistanivelesgallud@gmail.com',
-		pass: 'chimpokomon'
+		user: 'asignaturagallud@gmail.com',//conquistanivelesgallud
+		pass: 'EstoyEnAlbacete'//chimpokomon
 	}
 });
 
