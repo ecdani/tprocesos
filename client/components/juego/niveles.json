@@ -1,6 +1,8 @@
 [
     {
-        "gravity": 50,
+        "gravity": 500,
+        "velocity": 50,
+        "acceleration": 50,
         "platforms": [
             {
                 "asset": "ground",
@@ -16,8 +18,7 @@
                 "asset": "ground2",
                 "x": 300,
                 "y": 200
-            }
-            ,
+            },
             {
                 "asset": "ground2",
                 "x": 500,
@@ -41,32 +42,56 @@
         ]
     },
     {
-        "gravity": 50,
+        "gravity": 400,
+        "velocity": 125,
+        "acceleration": 125,
         "platforms": [
             {
                 "asset": "ground2",
-                "x": 750,
-                "y": 450
+                "x": 600,
+                "y": 400
             },
             {
                 "asset": "ground2",
-                "x": 600,
-                "y": 350
+                "x": 400,
+                "y": 400
+            },
+            {
+                "asset": "ground2",
+                "x": 200,
+                "y": 400
+            },
+            {
+                "asset": "ground2",
+                "x": 0,
+                "y": 400
             },
             {
                 "asset": "ground2",
                 "x": 700,
-                "y": 250
+                "y": 200
             },
             {
                 "asset": "ground2",
-                "x": 600,
-                "y": 150
+                "x": 500,
+                "y": 200
+            },
+            {
+                "asset": "ground2",
+                "x": 300,
+                "y": 200
+            },
+            {
+                "asset": "ground2",
+                "x": 100,
+                "y": 200
             }
         ]
     },
     {
-        "gravity": 50,
+        "gravity": 500,
+        "velocity": 150,
+        "acceleration": 150,
         "platforms": [
             {
                 "asset": "ground2",
@@ -87,56 +112,195 @@
                 "asset": "ground2",
                 "x": 200,
                 "y": 150
+            },
+            {
+                "asset": "ground2",
+                "x": 400,
+                "y": 450
+            },
+            {
+                "asset": "ground2",
+                "x": 460,
+                "y": 350
+            },
+            {
+                "asset": "ground2",
+                "x": 560,
+                "y": 250
+            },
+            {
+                "asset": "ground2",
+                "x": 400,
+                "y": 150
             }
         ]
     },
     {
-        "gravity": 50,
+        "gravity": 500,
+        "velocity": 175,
+        "acceleration": 175,
         "platforms": [
             {
                 "asset": "ground2",
+                "x": 0,
+                "y": 100
+            },
+            {
+                "asset": "ground2",
+                "x": 100,
+                "y": 100
+            },
+            {
+                "asset": "ground2",
                 "x": 200,
+                "y": 100
+            },
+            {
+                "asset": "ground2",
+                "x": 560,
+                "y": 200
+            },
+            {
+                "asset": "ground2",
+                "x": 460,
+                "y": 200
+            },
+            {
+                "asset": "ground2",
+                "x": 360,
+                "y": 200
+            },
+            {
+                "asset": "ground2",
+                "x": 0,
                 "y": 300
             },
             {
                 "asset": "ground2",
                 "x": 100,
-                "y": 350
-            },
-            {
-                "asset": "ground2",
-                "x": 400,
-                "y": 450
+                "y": 300
             },
             {
                 "asset": "ground2",
                 "x": 200,
-                "y": 150
+                "y": 300
+            },
+                {
+                "asset": "ground2",
+                "x": 560,
+                "y": 400
+            },
+            {
+                "asset": "ground2",
+                "x": 460,
+                "y": 400
+            },
+            {
+                "asset": "ground2",
+                "x": 360,
+                "y": 400
+            },
+                      {
+                "asset": "ground2",
+                "x": 0,
+                "y": 500
+            },
+            {
+                "asset": "ground2",
+                "x": 100,
+                "y": 500
+            },
+            {
+                "asset": "ground2",
+                "x": 200,
+                "y": 500
             }
         ]
     },
-      {
-        "gravity": 50,
+    {
+        "gravity": 400,
+        "velocity": 200,
+        "acceleration": 200,
         "platforms": [
             {
                 "asset": "ground2",
-                "x": 200,
+                "x": 0,
+                "y": 400
+            },
+                        {
+                "asset": "ground2",
+                "x": 0,
                 "y": 300
             },
-            {
+                        {
                 "asset": "ground2",
-                "x": 100,
-                "y": 350
+                "x": 0,
+                "y": 200
             },
-            {
+                        {
                 "asset": "ground2",
-                "x": 400,
-                "y": 450
+                "x": 0,
+                "y": 100
             },
-            {
+                        {
                 "asset": "ground2",
-                "x": 200,
-                "y": 150
+                "x": 150,
+                "y": 400
+            },
+                        {
+                "asset": "ground2",
+                "x": 150,
+                "y": 300
+            },
+                        {
+                "asset": "ground2",
+                "x": 150,
+                "y": 200
+            },
+                        {
+                "asset": "ground2",
+                "x": 150,
+                "y": 100
+            },
+                                    {
+                "asset": "ground2",
+                "x": 560,
+                "y": 400
+            },
+                        {
+                "asset": "ground2",
+                "x": 560,
+                "y": 300
+            },
+                        {
+                "asset": "ground2",
+                "x": 560,
+                "y": 200
+            },
+                        {
+                "asset": "ground2",
+                "x": 560,
+                "y": 100
+            },
+                                              {
+                "asset": "ground2",
+                "x": 410,
+                "y": 400
+            },
+                        {
+                "asset": "ground2",
+                "x": 410,
+                "y": 300
+            },
+                        {
+                "asset": "ground2",
+                "x": 410,
+                "y": 200
+            },
+                        {
+                "asset": "ground2",
+                "x": 410,
+                "y": 100
             }
         ]
     }

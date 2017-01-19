@@ -97,7 +97,7 @@ juegoState.prototype = {
 
         //  Player physics properties. Give the little guy a slight bounce.
         player.body.bounce.y = 0.01;
-        player.body.gravity.y = 500;
+        player.body.gravity.y =  niveles[nivel].gravity;//500;
         player.body.collideWorldBounds = true;
         //player.body.setCircle(20);
 
@@ -125,8 +125,8 @@ juegoState.prototype = {
             var star = stars.create(i * 70, 0, 'star');
 
             //  Let gravity do its thing
-            star.body.velocity.y = 500;
-            star.body.acceleration.y = 100;
+            star.body.velocity.y =  niveles[nivel].velocity;//500;
+            star.body.acceleration.y =  niveles[nivel].acceleration; //100;
             //star.body.gravity.y = 500;
             star.body.velocity.x = Math.floor(Math.random() * 1001) - 500;
 
@@ -177,7 +177,7 @@ juegoState.prototype = {
 
         game.physics.arcade.overlap(player, stars, this.damageStar, null, this);
         game.physics.arcade.overlap(weapon.bullets, stars, this.collectStar, null, this);
-        game.physics.arcade.overlap(weapon.bullets, platforms, weapon.kill, null, this);
+        game.physics.arcade.overlap(weapon.bullets, platforms, this.clearBullet, null, this);
 
 
         //  Reset the players velocity (movement)
@@ -268,6 +268,9 @@ juegoState.prototype = {
             player.animations.play('jump');
         }
         this.checkVictory();
+    },
+     clearBullet: function (weapon, platform) {
+        weapon.kill();
     },
 
     /**
