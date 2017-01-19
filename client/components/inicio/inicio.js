@@ -1,5 +1,4 @@
 
-
 $('.enlaceLogout').on('click', logout);
 $('.enlaceEdicion').on('click', mostrarEdicion);
 $('.enlaceCreacion').on('click', mostrarCreacion);
@@ -7,9 +6,9 @@ $('.enlaceAutenticacion').on('click', mostrarAutenticacion);
 $('.enlaceEstadistica').on('click', mostrarEstadistica);
 $('.enlaceInfo').on('click', mostrarInfo);
 
-
-
-
+/**
+ * Acciones al mostrar la intro
+ */
 function mostrarIntro() {
   $('#control').load('../components/inicio/intro.html', function () {
     $('#enlaceCreacion').on('click', mostrarCreacion);
@@ -17,11 +16,17 @@ function mostrarIntro() {
   });
 }
 
+/**
+ * Acciones al mostrar la info
+ */
 function mostrarInfo() {
   $('#control').load('../components/info/info.html', function () {
   });
 }
 
+/**
+ * Acciones al mostrar la autenticación
+ */
 function mostrarAutenticacion() {
   $.when(
     $('#control').load('../components/usuario/login.html'),
@@ -31,8 +36,10 @@ function mostrarAutenticacion() {
   });
 }
 
+/**
+ * Acciones al mostrar la creacion
+ */
 function mostrarCreacion() {
-  //eval("riasa()");
   $.when(
     $('#control').load('../components/usuario/creacion.html'),
     $.getScript("../components/usuario/creacion.js")
@@ -41,6 +48,9 @@ function mostrarCreacion() {
   });
 }
 
+/**
+ * Acciones al mostrar la edicion
+ */
 function mostrarEdicion(event) {
   if (!(game.world === null)) {
     game.destroy();
@@ -53,8 +63,10 @@ function mostrarEdicion(event) {
   });
 }
 
+/**
+ * Acciones al mostrar el ranking o estadistica
+ */
 function mostrarEstadistica(event) {
-
   $('#status').empty();
   $.when(
     $('#control').load('../components/estadistica/estadistica.html'),
@@ -69,6 +81,9 @@ function mostrarEstadistica(event) {
   });
 }
 
+/**
+ * Acciones al mostrar el juego
+ */
 function mostrarJuego() {
   $.when(
     $.getScript("../components/juego/juegoState.js"),

@@ -334,7 +334,6 @@ function borrarUsuario2(usuario) {
 /**
  * Ejecución de pruebas
  */
-
 MongoClient.connect(urlMongo, conexion);
 function conexion(err, base) {
 	db = base;

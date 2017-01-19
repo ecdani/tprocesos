@@ -50,7 +50,7 @@ app.get("/", function (req, res) {
 
 app.post('/crearUsuario', function (req, res) {
 	var usuario = new modelo.Usuario();
-	
+
 	usuario.nombre = req.body.nombre;
 	usuario.password = req.body.password;
 	usuario.email = req.body.email;
@@ -75,7 +75,6 @@ app.post('/crearUsuario', function (req, res) {
 });
 
 app.get('/reenviarMail', function (req, res) {
-	//console.log(req.body);
 	var usuario = new modelo.Usuario();
 	usuario.loadSession(req.session.usuario);
 
@@ -97,7 +96,6 @@ app.get('/reenviarMail', function (req, res) {
 
 app.get("/confirmarCuenta/:email/:token", function (req, res) {
 	console.log("Confirmando cuenta...")
-	//var email = req.params.email;
 	var token = req.params.token;
 
 	var usuario = req.session.usuario;
@@ -109,7 +107,6 @@ app.get("/confirmarCuenta/:email/:token", function (req, res) {
 		if (err) {
 			res.status(500).send('Error en el servidor.');
 		} else if (doc) {
-			//console.log(usuario);
 			usuario.validar(token, doneValidar, failValidar);
 		} else {
 			res.status(404).send('Usuario no encontrado');
@@ -135,11 +132,6 @@ app.get('/getUsuario', function (req, res) {
 });
 
 app.post('/editarUsuario', function (req, res) {
-	console.log("Mostrando la sesion en la petición de edición de usuario:");
-	console.log(req.session);
-	console.log("Mostrando el req.body:");
-	console.log(req.body);
-	//var usuario = req.session.usuario;
 	usuario = new modelo.Usuario();
 	usuario.loadSession(req.session.usuario);
 
@@ -177,7 +169,6 @@ app.post('/autenticarse', function (req, res) {
 	var usuario = req.session.usuario;
 
 	usuario.email = req.body.email;
-	//var email = req.body.email;
 	var password = req.body.password;
 
 	usuario.cargar(callback);
@@ -188,10 +179,6 @@ app.post('/autenticarse', function (req, res) {
 		} else if (doc) {
 			if (doc.password == password) {
 				if (doc.enabled == true) {
-					/*this.juego = new modelo.Juego();
-					this.juego.agregarNivel(new modelo.Nivel("1"));
-					this.juego.agregarUsuario(doc);*/ /** PODRIA CAMIAR EN crear */
-
 					res.status(200).send("Autenticado");
 				} else {
 					res.status(401).send('Usuario no validado aún. Por favor revise su correo y confirme la cuenta.');
@@ -219,14 +206,12 @@ app.get('/estadistica.json', function (req, res) {
 		if (err) {
 			res.status(500).send('Error en el servidor.');
 		} else if (docs) {
-			console.log("LA SALIDA DE ESTADISTICA:");
-			console.log(docs);
 			res.send(docs);
 		} else {
 			res.status(404).send('Estadistica no encontrada');
 		}
 	}
-	
+
 });
 
 app.post('/nivelCompletado', function (req, res) {
@@ -235,19 +220,16 @@ app.post('/nivelCompletado', function (req, res) {
 
 	console.log("Registrando nivel completado");
 
-	console.log(usuario);
-	console.log(req.body);
 	if (usuario.segundos[req.body.nivel] > parseInt(req.body.segundos) || usuario.segundos[parseInt(req.body.nivel)] == '?') {
-		console.log("Reasigno segundos" + req.body.segundos);
 		usuario.segundos[req.body.nivel] = parseInt(req.body.segundos);
-		
+
 		usuario.score = 0;
-		for ( i = 0; i < usuario.segundos.length; i++ ) {
-			if (usuario.segundos[i] != '?'){
+		for (i = 0; i < usuario.segundos.length; i++) {
+			if (usuario.segundos[i] != '?') {
 				usuario.score += usuario.segundos[i];
 			}
-			
-   		}
+
+		}
 	}
 
 	usuario.editar(callback);

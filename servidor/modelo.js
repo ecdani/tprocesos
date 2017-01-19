@@ -1,9 +1,7 @@
 var exports = module.exports = {};
 
 var MongoClient = require('mongodb').MongoClient; // V 3.2.10
-
 var db;
-
 var url = 'mongodb://tprocesos:tprocesos@ds135577.mlab.com:35577/procesos-gallud';
 
 MongoClient.connect(url, conexion);
@@ -11,20 +9,9 @@ function conexion(err, base) {
     db = base;
 }
 
-/*
-exports.Juego = function () {
-    this.nombre = "Niveles";
-    this.niveles = [];
-    this.usuarios = [];
-    this.agregarNivel = function (nivel) {
-        this.niveles.push(nivel);
-    }
-    this.agregarUsuario = function (usuario) {
-        this.usuarios.push(usuario);
-    }
-}*/
-
-
+/**
+ * Objeto colección de usuarios
+ */
 exports.Usuarios = function () {
 
     /**
@@ -45,6 +32,9 @@ exports.Usuarios = function () {
     };
 }
 
+/**
+ * Objeto usuario del servidor
+ */
 exports.Usuario = function () {
     this.nombre = '';
     this.password = ''; // Debería cifrarse
@@ -104,6 +94,7 @@ exports.Usuario = function () {
             callback(err, r);
         };
     };
+    
     /**
      * Cargar usuario desde sesión
      */
@@ -122,14 +113,9 @@ exports.Usuario = function () {
      * Editar usuario
      */
     this.editar = function (callback) {
-        console.log("This de editar");
-        console.log(this);
         console.log("Edicion del usuario nombre:" + this.nombre);
         db.collection('usuarios').findOneAndUpdate({ 'email': this.email }, this, { returnOriginal: false }, findOneAndUpdateCallback);
-        //{ $set: { 'password': usuario.password } }
         function findOneAndUpdateCallback(err, r) {
-            //console.log("Resultado nueva edicion");
-            //console.log(r);
             callback(err, r.value);
         };
     };
@@ -141,10 +127,8 @@ exports.Usuario = function () {
         console.log("Borrado del usuario nombre:" + this.nombre);
         db.collection('usuarios').deleteOne({ 'email': this.email }, deleteOneCallback);
         function deleteOneCallback(err, r) {
-            //console.log(r);
             callback(err, r);
         };
     };
-
 }
 

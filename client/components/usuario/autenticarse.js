@@ -27,9 +27,9 @@ var Singleton = (function () {
 
 Singleton.getInstance().loadCookie();
 
-
 /**
- * Comprobacion de contraseñas.
+ * Comprobacion de contraseñas. Muestra el mensaje de error de
+ * las contraseñas.
  */
 function checkPasswordMatch() {
     var password = $("#password").val();
@@ -110,13 +110,13 @@ function Usuario() {
 
     /**
      * Carga el usuario desde la sesión en el servidor
+     * @param done Función de callback en caso de éxito de la operación
+     * @param fail Función de callback en caso de fracaso de la operación
      */
-    this.loadSession = function (done,fail) {
+    this.loadSession = function (done, fail) {
         $.get("/getUsuario", {
             email: this.email
         }).done(function (data, status) {
-            console.log("RECUPERANDO CON LOAD SESSION");
-            console.log(data);
             this.nombre = data.nombre;
             this.email = data.email;
             this.segundos = data.segundos;
@@ -124,7 +124,6 @@ function Usuario() {
             this.score = data.score;
             this.partida = data.partida;
             $.cookie("usuario", JSON.stringify(this));
-            //done(data,status);
         }).done(done).fail(fail);
     };
 
@@ -144,33 +143,36 @@ function Usuario() {
             err = this.autenticarse(doneAutenticarse, failGenerico);
             if (err) {
                 mostrarInfo();
-                console.log("Cookie incorrecta");
                 $.removeCookie("usuario");
             }
         } else {
             mostrarIntro();
-            console.log("No cookie");
         }
     }
 }
 
-
 /**
- * Funcionalidad posterior a autenticarse. y a la creación
+ * Funcionalidad posterior a autenticarse y a la creación.
+ * @param juego Objeto juego (respuesta)
+ * @param status estado de la operacion
  */
 function doneAutenticarse(juego, status) {
-
-    $('.enlaceCreacion').hide(); //.toggleClass( "active" )
+    $('.enlaceCreacion').hide();
     $('.enlaceAutenticacion').hide();
     $('.enlaceLogout').show();
     $('.enlaceEdicion').show();
-    console.log("Ejecutando doneAutenticarse");
     usuario = Singleton.getInstance();
-    usuario.loadSession(function(data, status){},failGenerico);
+    usuario.loadSession(function (data, status) { }, failGenerico);
 
     mostrarJuego();
 }
 
+/**
+ * Tratamiento de errores universal.
+ * @param jqXHR código de error
+ * @param textStatus texto del error
+ * @param errorThrown excepcion
+ */
 function failGenerico(jqXHR, textStatus, errorThrown) {
     console.log(jqXHR);
     $("#autenticacionInfo").html(jqXHR.responseText);
